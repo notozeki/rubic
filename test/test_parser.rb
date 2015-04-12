@@ -68,4 +68,13 @@ SCHEME
       (else x))
 SCHEME
   end
+
+  def test_parse_if_statement
+    assert_equal [:if, ['<', 'x', 0], ['-', 'x'], 'x'],
+                 @parser.parse(<<SCHEME)
+(if (< x 0)
+    (- x)
+    x)
+SCHEME
+  end
 end

@@ -6,6 +6,7 @@ rule
         | define
         | define_proc
         | cond
+        | if
 
   /* Expressions */
   expr  : '(' '+' exprs ')'
@@ -96,6 +97,12 @@ rule
             {
               [:else, val[2]]
             }
+
+  /* If statement */
+  if  : '(' KW_IF expr expr expr ')'
+        {
+          [:if, val[2], val[3], val[4]]
+        }
 end
 
 ---- header
@@ -129,6 +136,8 @@ def next_token
       [:KW_COND, nil]
     when 'else'
       [:KW_ELSE, nil]
+    when 'if'
+      [:KW_IF, nil]
     else
       [:IDENT, @s[0]]
     end

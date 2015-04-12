@@ -61,6 +61,9 @@ module Rubic
           end
         end
         return
+      when :if
+        _, pred, cons, alt = list
+        return execute(pred, env) ? execute(cons, env) : execute(alt, env)
       else
         # fallthrough
       end

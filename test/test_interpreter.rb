@@ -80,4 +80,16 @@ SCHEME
     assert_equal 0,  @rubic.evaluate('(abs 0)')
     assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
   end
+
+  def test_evaluate_if_statement
+    @rubic.evaluate(<<SCHEME)
+(define (abs x)
+  (if (< x 0)
+      (- x)
+      x))
+SCHEME
+    assert_equal 10, @rubic.evaluate('(abs 10)')
+    assert_equal 0,  @rubic.evaluate('(abs 0)')
+    assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
+  end
 end
