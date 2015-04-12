@@ -6,7 +6,7 @@ class TestInterpreter < Minitest::Test
     @rubic = ::Rubic::Interpreter.new
   end
 
-  def test_execute_expressions
+  def test_evaluate_expressions
     assert_equal 486,  @rubic.evaluate('486')
     assert_equal 486,  @rubic.evaluate('(+ 137 349)')
     assert_equal 666,  @rubic.evaluate('(- 1000 334)')
@@ -17,7 +17,7 @@ class TestInterpreter < Minitest::Test
     assert_equal 1200, @rubic.evaluate('(* 25 4 12)')
   end
 
-  def test_execute_nested_expressions
+  def test_evaluate_nested_expressions
     assert_equal 19, @rubic.evaluate('(+ (* 3 5) (- 10 6))')
     assert_equal 57, @rubic.evaluate('(+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))')
     assert_equal 57, @rubic.evaluate(<<SCHEME)
@@ -29,7 +29,7 @@ class TestInterpreter < Minitest::Test
 SCHEME
   end
 
-  def test_execute_define_statement
+  def test_evaluate_define_statement
     @rubic.evaluate('(define size 2)')
     assert_equal 2, @rubic.evaluate('size')
 
@@ -41,7 +41,7 @@ SCHEME
     assert_equal 62.8318, @rubic.evaluate('circumference')
   end
 
-  def test_execute_procedure_definitions
+  def test_evaluate_procedure_definitions
     @rubic.evaluate('(define (square x) (* x x))')
     assert_equal 441, @rubic.evaluate('(square 21)')
     assert_equal 49,  @rubic.evaluate('(square (+ 2 5))')
