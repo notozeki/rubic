@@ -7,24 +7,21 @@ rule
 
   expr    : '(' '+' exprs ')'
             {
-              val[2].reduce(&:+)
+              ['+', *val[2]]
             }
           | '(' '-' exprs ')'
             {
-              val[2].reduce(&:-)
+              ['-', *val[2]]
             }
           | '(' '*' exprs ')'
             {
-              val[2].reduce(&:*)
+              ['*', *val[2]]
             }
           | '(' '/' exprs ')'
             {
-              val[2].reduce(&:'/')
+              ['/', *val[2]]
             }
           | IDENT
-            {
-              @global[val[0]]
-            }
           | NUMBER
 
   exprs   : expr
@@ -38,7 +35,7 @@ rule
 
   define  : '(' KW_DEFINE IDENT expr ')'
             {
-              @global[val[2]] = val[3]
+              [:define, val[2], val[3]]
             }
 end
 
@@ -50,10 +47,6 @@ module Rubic
 
 ---- inner
 EOT = [false, nil] # end of token
-
-def initialize
-  @global = {}
-end
 
 def parse(str)
   @s = StringScanner.new(str)

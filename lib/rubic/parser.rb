@@ -13,12 +13,8 @@ module Rubic
 
 class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 52)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 49)
 EOT = [false, nil] # end of token
-
-def initialize
-  @global = {}
-end
 
 def parse(str)
   @s = StringScanner.new(str)
@@ -99,7 +95,7 @@ racc_reduce_table = [
   4, 13, :_reduce_4,
   4, 13, :_reduce_5,
   4, 13, :_reduce_6,
-  1, 13, :_reduce_7,
+  1, 13, :_reduce_none,
   1, 13, :_reduce_none,
   1, 15, :_reduce_9,
   2, 15, :_reduce_10,
@@ -172,58 +168,53 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'parser.y', 9)
   def _reduce_3(val, _values)
-                  val[2].reduce(&:+)
+                  ['+', *val[2]]
             
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 13)
   def _reduce_4(val, _values)
-                  val[2].reduce(&:-)
+                  ['-', *val[2]]
             
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 17)
   def _reduce_5(val, _values)
-                  val[2].reduce(&:*)
+                  ['*', *val[2]]
             
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 21)
   def _reduce_6(val, _values)
-                  val[2].reduce(&:'/')
+                  ['/', *val[2]]
             
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 25)
-  def _reduce_7(val, _values)
-                  @global[val[0]]
-            
-  end
-.,.,
+# reduce 7 omitted
 
 # reduce 8 omitted
 
-module_eval(<<'.,.,', 'parser.y', 31)
+module_eval(<<'.,.,', 'parser.y', 28)
   def _reduce_9(val, _values)
                   [val[0]]
             
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 35)
+module_eval(<<'.,.,', 'parser.y', 32)
   def _reduce_10(val, _values)
                   val[0].push(val[1])
             
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 40)
+module_eval(<<'.,.,', 'parser.y', 37)
   def _reduce_11(val, _values)
-                  @global[val[2]] = val[3]
+                  [:define, val[2], val[3]]
             
   end
 .,.,
