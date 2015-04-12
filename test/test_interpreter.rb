@@ -40,4 +40,23 @@ SCHEME
     @rubic.evaluate('(define circumference (* 2 pi radius))')
     assert_equal 62.8318, @rubic.evaluate('circumference')
   end
+
+  def test_execute_procedure_definitions
+    @rubic.evaluate('(define (square x) (* x x))')
+    assert_equal 441, @rubic.evaluate('(square 21)')
+    assert_equal 49,  @rubic.evaluate('(square (+ 2 5))')
+    assert_equal 81,  @rubic.evaluate('(square (square 3))')
+
+    @rubic.evaluate(<<SCHEME)
+(define (sum-of-squares x y)
+  (+ (square x) (square y)))
+SCHEME
+    assert_equal 25, @rubic.evaluate('(sum-of-squares 3 4)')
+
+    @rubic.evaluate(<<SCHEME)
+(define (f a)
+  (sum-of-squares (+ a 1) (* a 2)))
+SCHEME
+    assert_equal 136, @rubic.evaluate('(f 5)')
+  end
 end

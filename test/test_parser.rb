@@ -39,4 +39,19 @@ SCHEME
     assert_equal [:define, 'circumference', ['*', 2, 'pi', 'radius']],
                  @parser.parse('(define circumference (* 2 pi radius))')
   end
+
+  def test_parse_procedure_definitions
+    assert_equal [:define_proc, ['square', 'x'], ['*', 'x', 'x']],
+                 @parser.parse('(define (square x) (* x x))')
+    assert_equal [:define_proc, ['sum-of-squares', 'x', 'y'], ['+', ['square', 'x'], ['square', 'y']]],
+                 @parser.parse(<<SCHEME)
+(define (sum-of-squares x y)
+  (+ (square x) (square y)))
+SCHEME
+    assert_equal [:define_proc, ['f', 'a'], ['sum-of-squares', ['+', 'a', 1], ['*', 'a', 2]]],
+                 @parser.parse(<<SCHEME)
+(define (f a)
+  (sum-of-squares (+ a 1) (* a 2)))
+SCHEME
+  end
 end

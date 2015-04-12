@@ -4,6 +4,7 @@ class Parser
 rule
   target  : expr
           | define
+          | define_proc
 
   expr    : '(' '+' exprs ')'
             {
@@ -21,6 +22,10 @@ rule
             {
               ['/', *val[2]]
             }
+          | '(' IDENT exprs ')'
+            {
+              [val[1], *val[2]]
+            }
           | IDENT
           | NUMBER
 
@@ -37,6 +42,20 @@ rule
             {
               [:define, val[2], val[3]]
             }
+
+  define_proc : '(' KW_DEFINE '(' IDENT params ')' expr ')'
+                {
+                  [:define_proc, [val[3], *val[4]], val[6]]
+                }
+
+  params      : /* empty */
+                {
+                  []
+                }
+              | params IDENT
+                {
+                  val[0].push(val[1])
+                }
 end
 
 ---- header
@@ -62,7 +81,7 @@ def next_token
     [:NUMBER, @s[0].include?('.') ? @s[0].to_f : @s[0].to_i]
   when @s.scan(/[#{Regexp.escape("()+-*/")}]/o)
     [@s[0], nil]
-  when @s.scan(/[A-Za-z_][A-Za-z0-9_]*/)
+  when @s.scan(/[A-Za-z_-][A-Za-z0-9_-]*/)
     case @s[0] # keyword check
     when 'define'
       [:KW_DEFINE, nil]
