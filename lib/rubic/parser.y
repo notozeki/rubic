@@ -2,48 +2,64 @@ class Parser
   options no_result_var
 
 rule
-  target  : expr
-          | define
-          | define_proc
+  stmt  : expr
+        | define
+        | define_proc
+        | cond
 
-  expr    : '(' '+' exprs ')'
-            {
-              ['+', *val[2]]
-            }
-          | '(' '-' exprs ')'
-            {
-              ['-', *val[2]]
-            }
-          | '(' '*' exprs ')'
-            {
-              ['*', *val[2]]
-            }
-          | '(' '/' exprs ')'
-            {
-              ['/', *val[2]]
-            }
-          | '(' IDENT exprs ')'
-            {
-              [val[1], *val[2]]
-            }
-          | IDENT
-          | NUMBER
+  /* Expressions */
+  expr  : '(' '+' exprs ')'
+          {
+            ['+', *val[2]]
+          }
+        | '(' '-' exprs ')'
+          {
+            ['-', *val[2]]
+          }
+        | '(' '*' exprs ')'
+          {
+            ['*', *val[2]]
+          }
+        | '(' '/' exprs ')'
+          {
+            ['/', *val[2]]
+          }
+        | '(' '<' expr expr ')'
+          {
+            ['<', val[2], val[3]]
+          }
+        | '(' '>' expr expr ')'
+          {
+            ['>', val[2], val[3]]
+          }
+        | '(' '=' expr expr ')'
+          {
+            ['=', val[2], val[3]]
+          }
+        | '(' IDENT exprs ')'
+          {
+            [val[1], *val[2]]
+          }
+        | IDENT
+        | NUMBER
 
-  exprs   : expr
-            {
-              [val[0]]
-            }
-          | exprs expr
-            {
-              val[0].push(val[1])
-            }
+  exprs : expr
+          {
+            [val[0]]
+          }
+        | exprs expr
+          {
+            val[0].push(val[1])
+          }
 
+  /* Define statement */
   define  : '(' KW_DEFINE IDENT expr ')'
             {
               [:define, val[2], val[3]]
             }
 
-  define_proc : '(' KW_DEFINE '(' IDENT params ')' expr ')'
+  /* Procedure definition */
+  define_proc : '(' KW_DEFINE '(' IDENT params ')' stmt ')'
                 {
                   [:define_proc, [val[3], *val[4]], val[6]]
                 }
@@ -56,6 +72,30 @@ rule
                 {
                   val[0].push(val[1])
                 }
+
+  /* Condition statement */
+  cond    : '(' KW_COND clauses ')'
+              {
+                [:cond, *val[2]]
+              }
+
+  clauses : clause
+            {
+              [val[0]]
+            }
+          | clauses clause
+            {
+              val[0].push(val[1])
+            }
+
+  clause  : '(' expr expr ')'
+            {
+              [val[1], val[2]]
+            }
+          | '(' KW_ELSE expr ')'
+            {
+              [:else, val[2]]
+            }
 end
 
 ---- header
@@ -79,12 +119,16 @@ def next_token
   case
   when @s.scan(/[0-9]+(\.[0-9]+)?/)
     [:NUMBER, @s[0].include?('.') ? @s[0].to_f : @s[0].to_i]
-  when @s.scan(/[#{Regexp.escape("()+-*/")}]/o)
+  when @s.scan(/[#{Regexp.escape("()+-*/<>=")}]/o)
     [@s[0], nil]
   when @s.scan(/[A-Za-z_-][A-Za-z0-9_-]*/)
     case @s[0] # keyword check
     when 'define'
       [:KW_DEFINE, nil]
+    when 'cond'
+      [:KW_COND, nil]
+    when 'else'
+      [:KW_ELSE, nil]
     else
       [:IDENT, @s[0]]
     end

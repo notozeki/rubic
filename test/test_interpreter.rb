@@ -59,4 +59,25 @@ SCHEME
 SCHEME
     assert_equal 136, @rubic.evaluate('(f 5)')
   end
+
+  def test_evaluate_cond_statement
+    @rubic.evaluate(<<SCHEME)
+(define (abs x)
+  (cond ((> x 0) x)
+        ((= x 0) 0)
+        ((< x 0) (- x))))
+SCHEME
+    assert_equal 10, @rubic.evaluate('(abs 10)')
+    assert_equal 0,  @rubic.evaluate('(abs 0)')
+    assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
+
+    @rubic.evaluate(<<SCHEME)
+(define (abs x)
+  (cond ((< x 0) (- x))
+        (else x)))
+SCHEME
+    assert_equal 10, @rubic.evaluate('(abs 10)')
+    assert_equal 0,  @rubic.evaluate('(abs 0)')
+    assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
+  end
 end

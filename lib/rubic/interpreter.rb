@@ -5,9 +5,12 @@ module Rubic
   class Interpreter
     DEFAULT_GLOBAL_VARS = {
       '+' => -> (*args) { args.reduce(:+) },
-      '-' => -> (*args) { args.reduce(:-) },
+      '-' => -> (*args) { args.size == 1 ? -args.first : args.reduce(:-) },
       '*' => -> (*args) { args.reduce(:*) },
       '/' => -> (*args) { args.reduce(:/) },
+      '<' => -> (a, b) { a < b },
+      '>' => -> (a, b) { a > b },
+      '=' => -> (a, b) { a == b },
     }
 
     def initialize
@@ -48,6 +51,14 @@ module Rubic
           local = Environment.new(env)
           local.bind(params, args)
           execute(body, local)
+        end
+        return
+      when :cond
+        _, *clauses = list
+        clauses.each do |pred, expr|
+          if pred == :else || execute(pred, env)
+            return execute(expr, env)
+          end
         end
         return
       else

@@ -54,4 +54,18 @@ SCHEME
   (sum-of-squares (+ a 1) (* a 2)))
 SCHEME
   end
+
+  def test_parse_cond_statement
+    assert_equal [:cond, [['>', 'x', 0], 'x'], [['=', 'x', 0], 0], [['<', 'x', 0], ['-', 'x']]],
+                 @parser.parse(<<SCHEME)
+(cond ((> x 0) x)
+      ((= x 0) 0)
+      ((< x 0) (- x)))
+SCHEME
+    assert_equal [:cond, [['<', 'x', 0], ['-', 'x']], [:else, 'x']],
+                 @parser.parse(<<SCHEME)
+(cond ((< x 0) (- x))
+      (else x))
+SCHEME
+  end
 end
