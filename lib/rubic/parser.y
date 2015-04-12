@@ -9,33 +9,13 @@ rule
         | if
 
   /* Expressions */
-  expr  : '(' '+' exprs ')'
+  expr  : '(' KW_AND exprs ')'
           {
-            ['+', *val[2]]
+            [:and, *val[2]]
           }
-        | '(' '-' exprs ')'
+        | '(' KW_OR exprs ')'
           {
-            ['-', *val[2]]
-          }
-        | '(' '*' exprs ')'
-          {
-            ['*', *val[2]]
-          }
-        | '(' '/' exprs ')'
-          {
-            ['/', *val[2]]
-          }
-        | '(' '<' expr expr ')'
-          {
-            ['<', val[2], val[3]]
-          }
-        | '(' '>' expr expr ')'
-          {
-            ['>', val[2], val[3]]
-          }
-        | '(' '=' expr expr ')'
-          {
-            ['=', val[2], val[3]]
+            [:or, *val[2]]
           }
         | '(' IDENT exprs ')'
           {
@@ -113,6 +93,7 @@ module Rubic
 
 ---- inner
 EOT = [false, nil] # end of token
+SYM_CHARS = Regexp.escape("+-*/<>=")
 
 def parse(str)
   @s = StringScanner.new(str)
@@ -126,9 +107,9 @@ def next_token
   case
   when @s.scan(/[0-9]+(\.[0-9]+)?/)
     [:NUMBER, @s[0].include?('.') ? @s[0].to_f : @s[0].to_i]
-  when @s.scan(/[#{Regexp.escape("()+-*/<>=")}]/o)
+  when @s.scan(/[\(\)]/o)
     [@s[0], nil]
-  when @s.scan(/[A-Za-z_-][A-Za-z0-9_-]*/)
+  when @s.scan(/[A-Za-z_#{SYM_CHARS}][A-Za-z0-9_#{SYM_CHARS}]*/o)
     case @s[0] # keyword check
     when 'define'
       [:KW_DEFINE, nil]
@@ -138,6 +119,10 @@ def next_token
       [:KW_ELSE, nil]
     when 'if'
       [:KW_IF, nil]
+    when 'and'
+      [:KW_AND, nil]
+    when 'or'
+      [:KW_OR, nil]
     else
       [:IDENT, @s[0]]
     end

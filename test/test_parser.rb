@@ -77,4 +77,11 @@ SCHEME
     x)
 SCHEME
   end
+
+  def test_predicate_expressions
+    assert_equal [:and, ['>', 'x', 5], ['<', 'x', 10]],
+                 @parser.parse('(and (> x 5) (< x 10))')
+    assert_equal [:or, ['>', 'x', 'y'], ['=', 'x', 'y']],
+                 @parser.parse('(or (> x y) (= x y))')
+  end
 end

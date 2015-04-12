@@ -92,4 +92,27 @@ SCHEME
     assert_equal 0,  @rubic.evaluate('(abs 0)')
     assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
   end
+
+  def test_evaluate_predicate_expressions
+    @rubic.evaluate('(define x 7)')
+    assert_equal true, @rubic.evaluate('(and (> x 5) (< x 10))')
+    @rubic.evaluate('(define x 1)')
+    assert_equal false, @rubic.evaluate('(and (> x 5) (< x 10))')
+
+    @rubic.evaluate(<<SCHEME)
+(define (>= x y)
+  (or (> x y) (= x y)))
+SCHEME
+    assert_equal true,  @rubic.evaluate('(>= 11 10)')
+    assert_equal true,  @rubic.evaluate('(>= 10 10)')
+    assert_equal false, @rubic.evaluate('(>= 9 10)')
+
+    @rubic.evaluate(<<SCHEME)
+(define (>= x y)
+  (not (< x y)))
+SCHEME
+    assert_equal true,  @rubic.evaluate('(>= 11 10)')
+    assert_equal true,  @rubic.evaluate('(>= 10 10)')
+    assert_equal false, @rubic.evaluate('(>= 9 10)')
+  end
 end

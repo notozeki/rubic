@@ -11,6 +11,7 @@ module Rubic
       '<' => -> (a, b) { a < b },
       '>' => -> (a, b) { a > b },
       '=' => -> (a, b) { a == b },
+      'not' => -> (a) { !a },
     }
 
     def initialize
@@ -64,6 +65,18 @@ module Rubic
       when :if
         _, pred, cons, alt = list
         return execute(pred, env) ? execute(cons, env) : execute(alt, env)
+      when :and
+        _, *exprs = list
+        exprs.each do |expr|
+          return false unless execute(expr, env)
+        end
+        return true
+      when :or
+        _, *exprs = list
+        exprs.each do |expr|
+          return true if execute(expr, env)
+        end
+        return false
       else
         # fallthrough
       end
