@@ -28,4 +28,16 @@ class TestParser < MiniTest::Test
       6))
 SCHEME
   end
+
+  def test_parse_define
+    @parser.parse('(define size 2)')
+    assert_equal 2, @parser.parse('size')
+
+    @parser.parse('(define pi 3.14159)')
+    @parser.parse('(define radius 10)')
+    assert_equal 314.159, @parser.parse('(* pi (* radius radius))')
+
+    @parser.parse('(define circumference (* 2 pi radius))')
+    assert_equal 62.8318, @parser.parse('circumference')
+  end
 end

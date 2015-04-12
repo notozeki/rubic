@@ -3,6 +3,7 @@ class Parser
 
 rule
   target  : expr
+          | define
 
   expr    : '(' '+' exprs ')'
             {
@@ -20,6 +21,10 @@ rule
             {
               val[2].reduce(&:'/')
             }
+          | IDENT
+            {
+              @global[val[0]]
+            }
           | NUMBER
 
   exprs   : expr
@@ -29,6 +34,11 @@ rule
           | exprs expr
             {
               val[0].push(val[1])
+            }
+
+  define  : '(' KW_DEFINE IDENT expr ')'
+            {
+              @global[val[2]] = val[3]
             }
 end
 
@@ -40,6 +50,10 @@ module Rubic
 
 ---- inner
 EOT = [false, nil] # end of token
+
+def initialize
+  @global = {}
+end
 
 def parse(str)
   @s = StringScanner.new(str)
@@ -55,6 +69,13 @@ def next_token
     [:NUMBER, @s[0].include?('.') ? @s[0].to_f : @s[0].to_i]
   when @s.scan(/[#{Regexp.escape("()+-*/")}]/o)
     [@s[0], nil]
+  when @s.scan(/[A-Za-z_][A-Za-z0-9_]*/)
+    case @s[0] # keyword check
+    when 'define'
+      [:KW_DEFINE, nil]
+    else
+      [:IDENT, @s[0]]
+    end
   else
     raise UnknownCharacterError, "unknown character #{@s.getch}"
   end

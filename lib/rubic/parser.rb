@@ -13,8 +13,12 @@ module Rubic
 
 class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 42)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 52)
 EOT = [false, nil] # end of token
+
+def initialize
+  @global = {}
+end
 
 def parse(str)
   @s = StringScanner.new(str)
@@ -30,6 +34,13 @@ def next_token
     [:NUMBER, @s[0].include?('.') ? @s[0].to_f : @s[0].to_i]
   when @s.scan(/[#{Regexp.escape("()+-*/")}]/o)
     [@s[0], nil]
+  when @s.scan(/[A-Za-z_][A-Za-z0-9_]*/)
+    case @s[0] # keyword check
+    when 'define'
+      [:KW_DEFINE, nil]
+    else
+      [:IDENT, @s[0]]
+    end
   else
     raise UnknownCharacterError, "unknown character #{@s.getch}"
   end
@@ -39,53 +50,64 @@ end
 ##### State transition tables begin ###
 
 racc_action_table = [
-     3,     3,     3,    20,    19,    10,     4,     4,     4,     3,
-     3,    18,     3,     5,     3,     4,     4,     3,     4,    16,
-     4,     3,     6,     4,     7,     8,     9,     4 ]
+     4,     8,    14,     9,    10,    11,     5,     6,     5,     6,
+     8,    20,     9,    10,    11,    13,    14,    12,    25,    14,
+     7,    14,     5,     6,    27,     5,     6,     5,     6,    14,
+   nil,    21,    14,   nil,   nil,     5,     6,   nil,     5,     6,
+    14,   nil,    24,    14,   nil,    23,     5,     6,    14,     5,
+     6,   nil,   nil,   nil,     5,     6 ]
 
 racc_action_check = [
-     0,    15,    14,    15,    14,     5,     0,    15,    14,    13,
-     6,    13,     7,     1,     9,    13,     6,    11,     7,    11,
-     9,     8,     3,    11,     3,     3,     3,     8 ]
+     0,    14,    20,    14,    14,    14,     0,     0,    20,    20,
+     4,    12,     4,     4,     4,     7,    19,     4,    19,     8,
+     1,     9,    19,    19,    26,     8,     8,     9,     9,    15,
+   nil,    15,    11,   nil,   nil,    15,    15,   nil,    11,    11,
+    18,   nil,    18,    17,   nil,    17,    18,    18,    10,    17,
+    17,   nil,   nil,   nil,    10,    10 ]
 
 racc_action_pointer = [
-    -2,    13,   nil,    19,   nil,     5,     8,    10,    19,    12,
-   nil,    15,   nil,     7,     0,    -1,   nil,   nil,   nil,   nil,
-   nil ]
+    -2,    20,   nil,   nil,     7,   nil,   nil,    15,    17,    19,
+    46,    30,     3,   nil,    -2,    27,   nil,    41,    38,    14,
+     0,   nil,   nil,   nil,   nil,   nil,    20,   nil ]
 
 racc_action_default = [
-    -9,    -9,    -1,    -9,    -6,    -9,    -9,    -9,    -9,    -9,
-    21,    -9,    -7,    -9,    -9,    -9,    -2,    -8,    -3,    -4,
-    -5 ]
+   -12,   -12,    -1,    -2,   -12,    -7,    -8,   -12,   -12,   -12,
+   -12,   -12,   -12,    28,   -12,   -12,    -9,   -12,   -12,   -12,
+   -12,    -3,   -10,    -4,    -5,    -6,   -12,   -11 ]
 
 racc_goto_table = [
-     2,    11,    13,    14,    15,     1,   nil,   nil,   nil,   nil,
-   nil,    17,   nil,    17,    17,    17 ]
+     2,    15,    17,    18,    19,     3,     1,   nil,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,    22,   nil,    22,    22,    22,
+    26 ]
 
 racc_goto_check = [
-     2,     3,     3,     3,     3,     1,   nil,   nil,   nil,   nil,
-   nil,     2,   nil,     2,     2,     2 ]
+     2,     4,     4,     4,     4,     3,     1,   nil,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,     2,   nil,     2,     2,     2,
+     2 ]
 
 racc_goto_pointer = [
-   nil,     5,     0,    -5 ]
+   nil,     6,     0,     5,    -7 ]
 
 racc_goto_default = [
-   nil,   nil,    12,   nil ]
+   nil,   nil,    16,   nil,   nil ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  1, 10, :_reduce_none,
-  4, 11, :_reduce_2,
-  4, 11, :_reduce_3,
-  4, 11, :_reduce_4,
-  4, 11, :_reduce_5,
-  1, 11, :_reduce_none,
-  1, 12, :_reduce_7,
-  2, 12, :_reduce_8 ]
+  1, 12, :_reduce_none,
+  1, 12, :_reduce_none,
+  4, 13, :_reduce_3,
+  4, 13, :_reduce_4,
+  4, 13, :_reduce_5,
+  4, 13, :_reduce_6,
+  1, 13, :_reduce_7,
+  1, 13, :_reduce_none,
+  1, 15, :_reduce_9,
+  2, 15, :_reduce_10,
+  5, 14, :_reduce_11 ]
 
-racc_reduce_n = 9
+racc_reduce_n = 12
 
-racc_shift_n = 21
+racc_shift_n = 28
 
 racc_token_table = {
   false => 0,
@@ -96,9 +118,11 @@ racc_token_table = {
   "-" => 5,
   "*" => 6,
   "/" => 7,
-  :NUMBER => 8 }
+  :IDENT => 8,
+  :NUMBER => 9,
+  :KW_DEFINE => 10 }
 
-racc_nt_base = 9
+racc_nt_base = 11
 
 racc_use_result_var = false
 
@@ -127,10 +151,13 @@ Racc_token_to_s_table = [
   "\"-\"",
   "\"*\"",
   "\"/\"",
+  "IDENT",
   "NUMBER",
+  "KW_DEFINE",
   "$start",
   "target",
   "expr",
+  "define",
   "exprs" ]
 
 Racc_debug_parser = false
@@ -141,46 +168,62 @@ Racc_debug_parser = false
 
 # reduce 1 omitted
 
-module_eval(<<'.,.,', 'parser.y', 8)
-  def _reduce_2(val, _values)
+# reduce 2 omitted
+
+module_eval(<<'.,.,', 'parser.y', 9)
+  def _reduce_3(val, _values)
                   val[2].reduce(&:+)
             
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 12)
-  def _reduce_3(val, _values)
+module_eval(<<'.,.,', 'parser.y', 13)
+  def _reduce_4(val, _values)
                   val[2].reduce(&:-)
             
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 16)
-  def _reduce_4(val, _values)
+module_eval(<<'.,.,', 'parser.y', 17)
+  def _reduce_5(val, _values)
                   val[2].reduce(&:*)
             
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 20)
-  def _reduce_5(val, _values)
+module_eval(<<'.,.,', 'parser.y', 21)
+  def _reduce_6(val, _values)
                   val[2].reduce(&:'/')
             
   end
 .,.,
 
-# reduce 6 omitted
-
-module_eval(<<'.,.,', 'parser.y', 26)
+module_eval(<<'.,.,', 'parser.y', 25)
   def _reduce_7(val, _values)
+                  @global[val[0]]
+            
+  end
+.,.,
+
+# reduce 8 omitted
+
+module_eval(<<'.,.,', 'parser.y', 31)
+  def _reduce_9(val, _values)
                   [val[0]]
             
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 30)
-  def _reduce_8(val, _values)
+module_eval(<<'.,.,', 'parser.y', 35)
+  def _reduce_10(val, _values)
                   val[0].push(val[1])
+            
+  end
+.,.,
+
+module_eval(<<'.,.,', 'parser.y', 40)
+  def _reduce_11(val, _values)
+                  @global[val[2]] = val[3]
             
   end
 .,.,
