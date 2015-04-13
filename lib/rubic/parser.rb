@@ -9,11 +9,10 @@ require 'racc/parser.rb'
 require 'strscan'
 
 module Rubic
-  class UnknownCharacterError < StandardError; end
 
 class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 114)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 113)
 EOT = [false, nil] # end of token
 SYM_CHARS = Regexp.escape("+-*/<>=?")
 
@@ -53,8 +52,12 @@ def next_token
       [:IDENT, @s[0]]
     end
   else
-    raise UnknownCharacterError, "unknown character #{@s.getch}"
+    raise Rubic::ParseError, "unknown character #{@s.getch}"
   end
+end
+
+def on_error(t, val, vstack)
+  raise Rubic::ParseError, "parse error near #{token_to_str(t)}"
 end
 
 ...end parser.y/module_eval...

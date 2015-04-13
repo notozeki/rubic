@@ -143,7 +143,7 @@ class TestInterpreter < Minitest::Test
         (sqrt-iter 1.0))
     SCHEME
     assert_equal 3.00009155413138, @rubic.evaluate('(sqrt 9)')
-    assert_raises ::Rubic::RubicRuntimeError do
+    assert_raises ::Rubic::NameError do
       # can't see `good-enough?` in global scope
       @rubic.evaluate('(good-enough? 10)')
     end

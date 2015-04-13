@@ -108,7 +108,6 @@ end
 require 'strscan'
 
 module Rubic
-  class UnknownCharacterError < StandardError; end
 
 ---- inner
 EOT = [false, nil] # end of token
@@ -150,8 +149,12 @@ def next_token
       [:IDENT, @s[0]]
     end
   else
-    raise UnknownCharacterError, "unknown character #{@s.getch}"
+    raise Rubic::ParseError, "unknown character #{@s.getch}"
   end
+end
+
+def on_error(t, val, vstack)
+  raise Rubic::ParseError, "parse error near #{token_to_str(t)}"
 end
 
 ---- footer

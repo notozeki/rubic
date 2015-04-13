@@ -1,6 +1,4 @@
 module Rubic
-  class RubicRuntimeError < StandardError; end
-
   class Environment
     def initialize(outer=nil)
       @outer = outer
@@ -17,13 +15,13 @@ module Rubic
       elsif @outer
         @outer.refvar(name)
       else
-        raise RubicRuntimeError, "undefined variable `#{name}'"
+        raise Rubic::NameError, "undefined variable `#{name}'"
       end
     end
 
     def bind(params, args)
       if params.size != args.size
-        raise RubicRuntimeError, "wrong number of arguments (#{args.size} for #{params.size})"
+        raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for #{params.size})"
       end
 
       params.each.with_index do |name, i|

@@ -21,7 +21,7 @@ class TestEnvironment < MiniTest::Test
   end
 
   def test_refers_undefined_variable_raises_exception
-    assert_raises ::Rubic::RubicRuntimeError do
+    assert_raises ::Rubic::NameError do
       @env.refvar('x')
     end
   end
@@ -33,7 +33,7 @@ class TestEnvironment < MiniTest::Test
   end
 
   def test_bind_wrong_number_of_arguments_raises_exception
-    assert_raises ::Rubic::RubicRuntimeError do
+    assert_raises ::Rubic::ArgumentError do
       @env.bind(['x', 'y', 'z'], [10, 20])
     end
   end
