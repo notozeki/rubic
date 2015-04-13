@@ -91,4 +91,13 @@ class TestParser < MiniTest::Test
     assert_equal [:lambda, ['x', 'y', 'z'], ['+', 'x', 'y', ['square', 'z']]],
                  @parser.parse('(lambda (x y z) (+ x y (square z)))')
   end
+
+  def test_parse_let_expression
+    assert_equal [:let, [['x', 3], ['y', ['+', 'x', 2]]], ['*', 'x', 'y']],
+                 @parser.parse(<<-SCHEME)
+      (let ((x 3)
+           (y (+ x 2)))
+        (* x y))
+    SCHEME
+  end
 end

@@ -21,6 +21,7 @@ rule
         | cond
         | if
         | lambda
+        | let
 
   seq   : expr
           {
@@ -87,6 +88,20 @@ rule
             {
               [:lambda, val[3], *val[5]]
             }
+
+  /* let expression */
+  let   : '(' KW_LET '(' defs ')' seq ')'
+          {
+            [:let, val[3], *val[5]]
+          }
+  defs  : /* empty */
+          {
+            []
+          }
+        | defs '(' IDENT expr ')'
+          {
+            val[0].push([val[2], val[3]])
+          }
 end
 
 ---- header
@@ -129,6 +144,8 @@ def next_token
       [:KW_OR, nil]
     when 'lambda'
       [:KW_LAMBDA, nil]
+    when 'let'
+      [:KW_LET, nil]
     else
       [:IDENT, @s[0]]
     end

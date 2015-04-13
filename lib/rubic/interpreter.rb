@@ -51,7 +51,7 @@ module Rubic
         env[name] = -> (*args) do
           local = Environment.new(env)
           local.bind(params, args)
-          body.map {|expr| execute(expr, local) }.last
+          execute_sequence(body, local)
         end
         return
       when :cond
@@ -82,15 +82,25 @@ module Rubic
         return -> (*args) do
           local = Environment.new(env)
           local.bind(params, args)
-          body.map {|expr| execute(expr, local) }.last
+          execute_sequence(body, local)
         end
+      when :let
+        _, (*defs), *body = list
+        local = Environment.new(env)
+        defs.each {|name, expr| local[name] = execute(expr, env) }
+        return execute_sequence(body, local)
       else
         # fallthrough
       end
 
-      # Anything else
+      # Procedure call
       op, *args = list.map {|e| execute(e, env) }
       op.call(*args)
+    end
+
+    def execute_sequence(seq, env)
+      # execute expressions sequentially and returns the last result
+      seq.reduce(nil) {|res, expr| res = execute(expr, env) }
     end
   end
 end

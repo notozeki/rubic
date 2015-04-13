@@ -180,4 +180,20 @@ class TestInterpreter < Minitest::Test
     @rubic.evaluate('(define (cube x) (* x x x))')
     assert_equal 0.24998750000000042, @rubic.evaluate('(integral cube 0 1 0.01)')
   end
+
+  def test_evaluate_let_expression
+    @rubic.evaluate('(define x 5)')
+    assert_equal 38, @rubic.evaluate(<<-SCHEME)
+      (+ (let ((x 3))
+           (+ x (* x 10)))
+         x)
+    SCHEME
+
+    @rubic.evaluate('(define x 2)')
+    assert_equal 12, @rubic.evaluate(<<-SCHEME)
+      (let ((x 3)
+            (y (+ x 2)))
+        (* x y))
+    SCHEME
+  end
 end
