@@ -115,4 +115,12 @@ SCHEME
     assert_equal true,  @rubic.evaluate('(>= 10 10)')
     assert_equal false, @rubic.evaluate('(>= 9 10)')
   end
+
+  def test_evaluate_operator_as_compound_expression
+    @rubic.evaluate(<<SCHEME)
+(define (a-plus-abs-b a b)
+  ((if (> b 0) + -) a b))
+SCHEME
+    assert_equal 11, @rubic.evaluate('(a-plus-abs-b 1 (- 10))')
+  end
 end

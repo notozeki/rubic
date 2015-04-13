@@ -2,33 +2,30 @@ class Parser
   options no_result_var
 
 rule
-  stmt  : expr
-        | define
-        | define_proc
-        | cond
-        | if
-
-  /* Expressions */
-  expr  : '(' KW_AND exprs ')'
+  expr  : '(' KW_AND seq ')'
           {
             [:and, *val[2]]
           }
-        | '(' KW_OR exprs ')'
+        | '(' KW_OR seq ')'
           {
             [:or, *val[2]]
           }
-        | '(' IDENT exprs ')'
+        | '(' expr seq ')'
           {
             [val[1], *val[2]]
           }
         | IDENT
         | NUMBER
+        | define
+        | define_proc
+        | cond
+        | if
 
-  exprs : expr
+  seq   : expr
           {
             [val[0]]
           }
-        | exprs expr
+        | seq expr
           {
             val[0].push(val[1])
           }
@@ -40,7 +37,7 @@ rule
             }
 
   /* Procedure definition */
-  define_proc : '(' KW_DEFINE '(' IDENT params ')' stmt ')'
+  define_proc : '(' KW_DEFINE '(' IDENT params ')' expr ')'
                 {
                   [:define_proc, [val[3], *val[4]], val[6]]
                 }
@@ -56,9 +53,9 @@ rule
 
   /* Condition statement */
   cond    : '(' KW_COND clauses ')'
-              {
-                [:cond, *val[2]]
-              }
+            {
+              [:cond, *val[2]]
+            }
 
   clauses : clause
             {
