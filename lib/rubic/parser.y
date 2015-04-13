@@ -37,9 +37,9 @@ rule
             }
 
   /* Procedure definition */
-  define_proc : '(' KW_DEFINE '(' IDENT params ')' expr ')'
+  define_proc : '(' KW_DEFINE '(' IDENT params ')' seq ')'
                 {
-                  [:define_proc, [val[3], *val[4]], val[6]]
+                  [:define_proc, [val[3], *val[4]], *val[6]]
                 }
 
   params      : /* empty */
@@ -90,7 +90,7 @@ module Rubic
 
 ---- inner
 EOT = [false, nil] # end of token
-SYM_CHARS = Regexp.escape("+-*/<>=")
+SYM_CHARS = Regexp.escape("+-*/<>=?")
 
 def parse(str)
   @s = StringScanner.new(str)

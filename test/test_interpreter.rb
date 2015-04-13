@@ -123,4 +123,29 @@ SCHEME
 SCHEME
     assert_equal 11, @rubic.evaluate('(a-plus-abs-b 1 (- 10))')
   end
+
+  def test_evaluate_block_structure
+    @rubic.evaluate(<<SCHEME)
+(define (sqrt x)
+  (define (square x) (* x x))
+  (define (abs x)
+    (if (< x 0) (- x) x))
+  (define (average x y)
+    (/ (+ x y) 2))
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess)
+    (if (good-enough? guess)
+        guess
+        (sqrt-iter (improve guess))))
+  (sqrt-iter 1.0))
+SCHEME
+    assert_equal 3.00009155413138, @rubic.evaluate('(sqrt 9)')
+    assert_raises ::Rubic::RubicRuntimeError do
+      # can't see `good-enough?` in global scope
+      @rubic.evaluate('(good-enough? 10)') 
+    end
+  end
 end

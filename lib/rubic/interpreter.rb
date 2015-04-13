@@ -47,11 +47,11 @@ module Rubic
         env[name] = execute(expr, env)
         return
       when :define_proc
-        _, (name, *params), body = list
+        _, (name, *params), *body = list
         env[name] = -> (*args) do
           local = Environment.new(env)
           local.bind(params, args)
-          execute(body, local)
+          body.map {|expr| execute(expr, local) }.last
         end
         return
       when :cond
