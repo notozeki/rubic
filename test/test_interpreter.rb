@@ -20,13 +20,13 @@ class TestInterpreter < Minitest::Test
   def test_evaluate_nested_expressions
     assert_equal 19, @rubic.evaluate('(+ (* 3 5) (- 10 6))')
     assert_equal 57, @rubic.evaluate('(+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))')
-    assert_equal 57, @rubic.evaluate(<<SCHEME)
-(+ (* 3
-      (+ (* 2 4)
-         (+ 3 5)))
-   (+ (- 10 7)
-      6))
-SCHEME
+    assert_equal 57, @rubic.evaluate(<<-SCHEME)
+      (+ (* 3
+            (+ (* 2 4)
+               (+ 3 5)))
+         (+ (- 10 7)
+            6))
+    SCHEME
   end
 
   def test_evaluate_define_statement
@@ -47,47 +47,47 @@ SCHEME
     assert_equal 49,  @rubic.evaluate('(square (+ 2 5))')
     assert_equal 81,  @rubic.evaluate('(square (square 3))')
 
-    @rubic.evaluate(<<SCHEME)
-(define (sum-of-squares x y)
-  (+ (square x) (square y)))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (sum-of-squares x y)
+        (+ (square x) (square y)))
+    SCHEME
     assert_equal 25, @rubic.evaluate('(sum-of-squares 3 4)')
 
-    @rubic.evaluate(<<SCHEME)
-(define (f a)
-  (sum-of-squares (+ a 1) (* a 2)))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (f a)
+        (sum-of-squares (+ a 1) (* a 2)))
+    SCHEME
     assert_equal 136, @rubic.evaluate('(f 5)')
   end
 
   def test_evaluate_cond_statement
-    @rubic.evaluate(<<SCHEME)
-(define (abs x)
-  (cond ((> x 0) x)
-        ((= x 0) 0)
-        ((< x 0) (- x))))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (abs x)
+        (cond ((> x 0) x)
+              ((= x 0) 0)
+              ((< x 0) (- x))))
+    SCHEME
     assert_equal 10, @rubic.evaluate('(abs 10)')
     assert_equal 0,  @rubic.evaluate('(abs 0)')
     assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
 
-    @rubic.evaluate(<<SCHEME)
-(define (abs x)
-  (cond ((< x 0) (- x))
-        (else x)))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (abs x)
+        (cond ((< x 0) (- x))
+              (else x)))
+    SCHEME
     assert_equal 10, @rubic.evaluate('(abs 10)')
     assert_equal 0,  @rubic.evaluate('(abs 0)')
     assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
   end
 
   def test_evaluate_if_statement
-    @rubic.evaluate(<<SCHEME)
-(define (abs x)
-  (if (< x 0)
-      (- x)
-      x))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (abs x)
+        (if (< x 0)
+            (- x)
+            x))
+    SCHEME
     assert_equal 10, @rubic.evaluate('(abs 10)')
     assert_equal 0,  @rubic.evaluate('(abs 0)')
     assert_equal 10, @rubic.evaluate('(abs (- 0 10))')
@@ -99,53 +99,53 @@ SCHEME
     @rubic.evaluate('(define x 1)')
     assert_equal false, @rubic.evaluate('(and (> x 5) (< x 10))')
 
-    @rubic.evaluate(<<SCHEME)
-(define (>= x y)
-  (or (> x y) (= x y)))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (>= x y)
+        (or (> x y) (= x y)))
+    SCHEME
     assert_equal true,  @rubic.evaluate('(>= 11 10)')
     assert_equal true,  @rubic.evaluate('(>= 10 10)')
     assert_equal false, @rubic.evaluate('(>= 9 10)')
 
-    @rubic.evaluate(<<SCHEME)
-(define (>= x y)
-  (not (< x y)))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (>= x y)
+        (not (< x y)))
+    SCHEME
     assert_equal true,  @rubic.evaluate('(>= 11 10)')
     assert_equal true,  @rubic.evaluate('(>= 10 10)')
     assert_equal false, @rubic.evaluate('(>= 9 10)')
   end
 
   def test_evaluate_operator_as_compound_expression
-    @rubic.evaluate(<<SCHEME)
-(define (a-plus-abs-b a b)
-  ((if (> b 0) + -) a b))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (a-plus-abs-b a b)
+        ((if (> b 0) + -) a b))
+    SCHEME
     assert_equal 11, @rubic.evaluate('(a-plus-abs-b 1 (- 10))')
   end
 
   def test_evaluate_block_structure
-    @rubic.evaluate(<<SCHEME)
-(define (sqrt x)
-  (define (square x) (* x x))
-  (define (abs x)
-    (if (< x 0) (- x) x))
-  (define (average x y)
-    (/ (+ x y) 2))
-  (define (good-enough? guess)
-    (< (abs (- (square guess) x)) 0.001))
-  (define (improve guess)
-    (average guess (/ x guess)))
-  (define (sqrt-iter guess)
-    (if (good-enough? guess)
-        guess
-        (sqrt-iter (improve guess))))
-  (sqrt-iter 1.0))
-SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (sqrt x)
+        (define (square x) (* x x))
+        (define (abs x)
+          (if (< x 0) (- x) x))
+        (define (average x y)
+          (/ (+ x y) 2))
+        (define (good-enough? guess)
+          (< (abs (- (square guess) x)) 0.001))
+        (define (improve guess)
+          (average guess (/ x guess)))
+        (define (sqrt-iter guess)
+          (if (good-enough? guess)
+              guess
+              (sqrt-iter (improve guess))))
+        (sqrt-iter 1.0))
+    SCHEME
     assert_equal 3.00009155413138, @rubic.evaluate('(sqrt 9)')
     assert_raises ::Rubic::RubicRuntimeError do
       # can't see `good-enough?` in global scope
-      @rubic.evaluate('(good-enough? 10)') 
+      @rubic.evaluate('(good-enough? 10)')
     end
   end
 end

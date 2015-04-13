@@ -23,13 +23,13 @@ class TestParser < MiniTest::Test
     assert_equal ['+', ['*', 3, ['+', ['*', 2, 4], ['+', 3, 5]]], ['+', ['-', 10, 7], 6]],
                  @parser.parse('(+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6))')
     assert_equal ['+', ['*', 3, ['+', ['*', 2, 4], ['+', 3, 5]]], ['+', ['-', 10, 7], 6]],
-                 @parser.parse(<<SCHEME)
-(+ (* 3
-      (+ (* 2 4)
-         (+ 3 5)))
-   (+ (- 10 7)
-      6))
-SCHEME
+                 @parser.parse(<<-SCHEME)
+      (+ (* 3
+            (+ (* 2 4)
+               (+ 3 5)))
+         (+ (- 10 7)
+            6))
+    SCHEME
   end
 
   def test_parse_define_statement
@@ -44,38 +44,38 @@ SCHEME
     assert_equal [:define_proc, ['square', 'x'], ['*', 'x', 'x']],
                  @parser.parse('(define (square x) (* x x))')
     assert_equal [:define_proc, ['sum-of-squares', 'x', 'y'], ['+', ['square', 'x'], ['square', 'y']]],
-                 @parser.parse(<<SCHEME)
-(define (sum-of-squares x y)
-  (+ (square x) (square y)))
-SCHEME
+                 @parser.parse(<<-SCHEME)
+      (define (sum-of-squares x y)
+        (+ (square x) (square y)))
+    SCHEME
     assert_equal [:define_proc, ['f', 'a'], ['sum-of-squares', ['+', 'a', 1], ['*', 'a', 2]]],
-                 @parser.parse(<<SCHEME)
-(define (f a)
-  (sum-of-squares (+ a 1) (* a 2)))
-SCHEME
+                 @parser.parse(<<-SCHEME)
+      (define (f a)
+        (sum-of-squares (+ a 1) (* a 2)))
+    SCHEME
   end
 
   def test_parse_cond_statement
     assert_equal [:cond, [['>', 'x', 0], 'x'], [['=', 'x', 0], 0], [['<', 'x', 0], ['-', 'x']]],
-                 @parser.parse(<<SCHEME)
-(cond ((> x 0) x)
-      ((= x 0) 0)
-      ((< x 0) (- x)))
-SCHEME
+                 @parser.parse(<<-SCHEME)
+      (cond ((> x 0) x)
+            ((= x 0) 0)
+            ((< x 0) (- x)))
+    SCHEME
     assert_equal [:cond, [['<', 'x', 0], ['-', 'x']], [:else, 'x']],
-                 @parser.parse(<<SCHEME)
-(cond ((< x 0) (- x))
-      (else x))
-SCHEME
+                 @parser.parse(<<-SCHEME)
+      (cond ((< x 0) (- x))
+            (else x))
+    SCHEME
   end
 
   def test_parse_if_statement
     assert_equal [:if, ['<', 'x', 0], ['-', 'x'], 'x'],
-                 @parser.parse(<<SCHEME)
-(if (< x 0)
-    (- x)
-    x)
-SCHEME
+                 @parser.parse(<<-SCHEME)
+      (if (< x 0)
+          (- x)
+          x)
+    SCHEME
   end
 
   def test_predicate_expressions
