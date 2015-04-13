@@ -77,6 +77,13 @@ module Rubic
           return true if execute(expr, env)
         end
         return false
+      when :lambda
+        _, (*params), *body = list
+        return -> (*args) do
+          local = Environment.new(env)
+          local.bind(params, args)
+          body.map {|expr| execute(expr, local) }.last
+        end
       else
         # fallthrough
       end

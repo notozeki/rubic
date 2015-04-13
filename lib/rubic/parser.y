@@ -20,6 +20,7 @@ rule
         | define_proc
         | cond
         | if
+        | lambda
 
   seq   : expr
           {
@@ -80,6 +81,12 @@ rule
         {
           [:if, val[2], val[3], val[4]]
         }
+
+  /* lambda expression */
+  lambda  : '(' KW_LAMBDA '(' params ')' seq ')'
+            {
+              [:lambda, val[3], *val[5]]
+            }
 end
 
 ---- header
@@ -120,6 +127,8 @@ def next_token
       [:KW_AND, nil]
     when 'or'
       [:KW_OR, nil]
+    when 'lambda'
+      [:KW_LAMBDA, nil]
     else
       [:IDENT, @s[0]]
     end

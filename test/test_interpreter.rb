@@ -148,4 +148,36 @@ class TestInterpreter < Minitest::Test
       @rubic.evaluate('(good-enough? 10)')
     end
   end
+
+  def test_evaluate_lambda_expression
+    @rubic.evaluate('(define (square x) (* x x))')
+    assert_equal 12, @rubic.evaluate('((lambda (x y z) (+ x y (square z))) 1 2 3)')
+
+    @rubic.evaluate(<<-SCHEME)
+      (define (sum term a next b)
+        (if (> a b)
+            0
+            (+ (term a)
+               (sum term (next a) next b))))
+    SCHEME
+    @rubic.evaluate(<<-SCHEME)
+      (define (pi-sum a b)
+        (sum (lambda (x) (/ 1.0 (* x (+ x 2))))
+             a
+             (lambda (x) (+ x 4))
+             b))
+    SCHEME
+    assert_equal 3.139592655589783, @rubic.evaluate('(* 8 (pi-sum 1 1000))')
+
+    @rubic.evaluate(<<-SCHEME)
+      (define (integral f a b dx)
+        (* (sum f
+                (+ a (/ dx 2.0))
+                (lambda (x) (+ x dx))
+                b)
+           dx))
+    SCHEME
+    @rubic.evaluate('(define (cube x) (* x x x))')
+    assert_equal 0.24998750000000042, @rubic.evaluate('(integral cube 0 1 0.01)')
+  end
 end

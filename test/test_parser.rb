@@ -84,4 +84,11 @@ class TestParser < MiniTest::Test
     assert_equal [:or, ['>', 'x', 'y'], ['=', 'x', 'y']],
                  @parser.parse('(or (> x y) (= x y))')
   end
+
+  def test_parse_lambda_expression
+    assert_equal [:lambda, ['x'], ['+', 'x', 4]],
+                 @parser.parse('(lambda (x) (+ x 4))')
+    assert_equal [:lambda, ['x', 'y', 'z'], ['+', 'x', 'y', ['square', 'z']]],
+                 @parser.parse('(lambda (x y z) (+ x y (square z)))')
+  end
 end
