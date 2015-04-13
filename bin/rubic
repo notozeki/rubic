@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'rubic'
+require 'readline'
+
+# TODO: read the code from file when argument passed
+
+puts "Welcome to interactive Rubic (v#{Rubic::VERSION})"
+puts 'Hit ^D to exit'
+
+rubic = Rubic::Interpreter.new
+
+while input = Readline.readline(">> ", true)
+  next if input.empty?
+  begin
+    puts '=> ' + rubic.evaluate(input).inspect
+  rescue Rubic::RubicError => e
+    puts "#{e.class}: #{e.message}"
+  end
+end
