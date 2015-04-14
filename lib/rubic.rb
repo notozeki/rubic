@@ -3,6 +3,7 @@ module Rubic
   class ArgumentError < RubicError; end
   class NameError < RubicError; end
   class ParseError < RubicError; end
+  class RuntimeError < RubicError; end
 end
 
 require 'rubic/version'

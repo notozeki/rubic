@@ -12,6 +12,13 @@ module Rubic
       '>' => -> (a, b) { a > b },
       '=' => -> (a, b) { a == b },
       'not' => -> (a) { !a },
+      'cons' => -> (a, b) { [a, b] },
+      'car' => -> (l) { l.first },
+      'cdr' => -> (l) { l.last },
+      'nil' => [],
+      'list' => -> (*args) { args.reverse.reduce([]) {|res, e| [e, res] } },
+      'null?' => -> (l) { l.is_a?(Array) ? l.empty? : false },
+      'pair?' => -> (l) { l.is_a?(Array) ? l.any? : false },
     }
 
     def initialize
@@ -40,6 +47,10 @@ module Rubic
       return atom if atom
 
       list = list_or_atom
+
+      # Empty list
+      return nil if list.empty?
+
       # Special Forms
       case list.first
       when :define
@@ -95,6 +106,9 @@ module Rubic
 
       # Procedure call
       op, *args = list.map {|e| execute(e, env) }
+      unless op.respond_to? :call
+        raise Rubic::RuntimeError, "`#{op}' is not a procedure"
+      end
       op.call(*args)
     end
 
