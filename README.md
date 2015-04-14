@@ -1,5 +1,9 @@
 # Rubic - A tiny Scheme interpreter
 
+[![Gem Version](https://badge.fury.io/rb/rubic.svg)](http://badge.fury.io/rb/rubic)
+[![Build Status](https://travis-ci.org/notozeki/rubic.svg)](https://travis-ci.org/notozeki/rubic)
+[![Coverage Status](https://coveralls.io/repos/notozeki/rubic/badge.svg)](https://coveralls.io/r/notozeki/rubic)
+
 **Rubic** is a very simple Scheme interpreter written in Ruby.
 
 NOTE: This is my hobby project. You may find it is good for nothing in practical uses :wink:
