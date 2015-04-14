@@ -15,4 +15,4 @@ namespace :racc do
 end
 
 task :test => 'racc:compile'
-task :default => 'racc:compile'
+task :default => :test
