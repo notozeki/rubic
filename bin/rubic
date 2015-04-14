@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'rubic'
+require 'rubic/inspector'
 require 'readline'
+
+using Rubic::Inspector
 
 # TODO: read the code from file when argument passed
 
@@ -15,6 +18,6 @@ while input = Readline.readline(">> ", true)
   begin
     puts '=> ' + rubic.evaluate(input).inspect
   rescue Rubic::RubicError => e
-    puts "#{e.class}: #{e.message}"
+    puts "\e[31mError: #{e.message}\e[0m"
   end
 end
