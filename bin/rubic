@@ -15,6 +15,10 @@ rubic = Rubic::Interpreter.new
 
 while input = Readline.readline(">> ", true)
   next if input.empty?
+  while input.count('(') > input.count(')')
+    input << Readline.readline(' | ', true)
+  end
+
   begin
     puts '=> ' + rubic.evaluate(input).inspect
   rescue Rubic::RubicError => e
