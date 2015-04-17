@@ -9,19 +9,26 @@ module Rubic
       :- => -> (*args) { args.size == 1 ? -args.first : args.reduce(:-) },
       :* => -> (*args) { args.reduce(:*) },
       :/ => -> (*args) { args.reduce(:/) },
+
       :< => -> (a, b) { a < b },
       :> => -> (a, b) { a > b },
       :'=' => -> (a, b) { a == b },
       :not => -> (a) { !a },
+      :eq? => -> (a, b) { a.equal? b },
+
       :cons => -> (a, b) { [a, b] },
       :car => -> (l) { l.first },
       :cdr => -> (l) { l.last },
-      :nil => [],
       :list => -> (*args) { args.reverse.reduce([]) {|res, e| [e, res] } },
       :null? => -> (l) { l.is_a?(Array) ? l.empty? : false },
       :pair? => -> (l) { l.is_a?(Array) ? l.any? : false },
+
       :display => -> (a) { print Rubic::Inspector.display(a) },
       :newline => -> () { puts },
+
+      :true => true,
+      :false => false,
+      :nil => [],
     }
 
     def initialize
@@ -47,12 +54,12 @@ module Rubic
       else
         # fallthrough
       end
-      return atom if atom
+      return atom unless atom.nil?
 
       list = list_or_atom
 
       # Empty list
-      return nil if list.empty?
+      return [] if list.empty?
 
       # Special Forms
       case list.first
@@ -103,6 +110,9 @@ module Rubic
         local = Environment.new(env)
         defs.each {|name, expr| local[name] = execute(expr, env) }
         return execute_sequence(body, local)
+      when :quote
+        _, expr = list
+        return quote(expr)
       else
         # fallthrough
       end
@@ -118,6 +128,14 @@ module Rubic
     def execute_sequence(seq, env)
       # execute expressions sequentially and returns the last result
       seq.reduce(nil) {|res, expr| res = execute(expr, env) }
+    end
+
+    def quote(expr)
+      if expr.is_a? Array
+        expr.map {|e| quote(e) }.reverse.reduce([]) {|res, e| [e, res] }
+      else
+        expr
+      end
     end
   end
 end

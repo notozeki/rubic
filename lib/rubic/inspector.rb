@@ -40,6 +40,12 @@ module Rubic
       end
     end
 
+    refine Symbol do
+      def inspect
+        to_s
+      end
+    end
+
     using self
     def self.display(obj)
       obj.to_s

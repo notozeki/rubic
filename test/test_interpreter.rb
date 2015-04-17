@@ -255,4 +255,26 @@ class TestInterpreter < Minitest::Test
     SCHEME
     assert_output("\n1/2") { @rubic.evaluate('(print-rat (make-rat 1 2))') }
   end
+
+  def test_evaluate_quote_expression
+    @rubic.evaluate('(define a 1)')
+    @rubic.evaluate('(define b 2)')
+    assert_equal [:a, [:b, []]], @rubic.evaluate("(list 'a 'b)")
+    assert_equal [:a, [2, []]], @rubic.evaluate("(list 'a b)")
+
+    assert_equal :a, @rubic.evaluate("(car '(a b c))")
+    assert_equal [:b, [:c, []]], @rubic.evaluate("(cdr '(a b c))")
+    assert_equal [:a, [[:b, [:c, []]], []]], @rubic.evaluate("'(a (b c))")
+
+    assert_equal [], @rubic.evaluate("'()")
+
+    @rubic.evaluate(<<-SCHEME)
+      (define (memq item x)
+        (cond ((null? x) false)
+              ((eq? item (car x)) x)
+              (else (memq item (cdr x)))))
+    SCHEME
+    refute @rubic.evaluate("(memq 'apple '(pear banana prune))")
+    assert_equal [:apple, [:pear, []]], @rubic.evaluate("(memq 'apple '(x (apple sauce) y apple pear))")
+  end
 end

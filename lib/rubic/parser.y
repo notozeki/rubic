@@ -14,6 +14,10 @@ rule
           {
             [val[1], *val[2]]
           }
+        | '(' ')'
+          {
+            []
+          }
         | IDENT
         | NUMBER
         | STRING
@@ -23,6 +27,7 @@ rule
         | if
         | lambda
         | let
+        | quote
 
   seq     : expr
             {
@@ -109,6 +114,16 @@ rule
           {
             val[0].push([val[2], val[3]])
           }
+
+  /* quote expression */
+  quote : '(' KW_QUOTE expr ')'
+          {
+            [:quote, val[2]]
+          }
+        | '\'' expr
+          {
+            [:quote, val[1]]
+          }
 end
 
 ---- header
@@ -132,7 +147,7 @@ def next_token
   case
   when @s.scan(/[0-9]+(\.[0-9]+)?/)
     [:NUMBER, @s[0].include?('.') ? @s[0].to_f : @s[0].to_i]
-  when @s.scan(/[\(\)]/o)
+  when @s.scan(/[()']/)
     [@s[0], nil]
   when @s.scan(/[A-Za-z_#{SYM_CHARS}][A-Za-z0-9_#{SYM_CHARS}]*/o)
     case @s[0] # keyword check
@@ -152,6 +167,8 @@ def next_token
       [:KW_LAMBDA, nil]
     when 'let'
       [:KW_LET, nil]
+    when 'quote'
+      [:KW_QUOTE, nil]
     else
       [:IDENT, @s[0].to_sym]
     end

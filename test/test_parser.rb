@@ -111,4 +111,13 @@ class TestParser < MiniTest::Test
     assert_equal [:op, :arg1, :arg2], @parser.parse('(op arg1 arg2)')
     assert_equal [:'op-no-arg'], @parser.parse('(op-no-arg)')
   end
+
+  def test_parse_quote_expression
+    assert_equal [:quote, :a], @parser.parse('(quote a)')
+    assert_equal @parser.parse('(quote a)'), @parser.parse("'a")
+    assert_equal [:quote, [:a, :b, :c]], @parser.parse('(quote (a b c))')
+    assert_equal @parser.parse('(quote (a b c))'), @parser.parse("'(a b c)")
+    assert_equal [:quote, []], @parser.parse('(quote ())')
+    assert_equal @parser.parse('(quote ())'), @parser.parse("'()")
+  end
 end

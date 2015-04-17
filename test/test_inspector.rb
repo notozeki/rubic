@@ -16,6 +16,7 @@ class TestInspector < MiniTest::Test
     assert_equal '((1 . 2) 3 . 4)', @rubic.evaluate('(cons (cons 1 2) (cons 3 4))').inspect
     assert_equal '(1 2 3 4)', @rubic.evaluate('(list 1 2 3 4)').inspect
     assert_equal '("a" . "b")', @rubic.evaluate('(cons "a" "b")').inspect
+    assert_equal '()', @rubic.evaluate('()').inspect
   end
 
   def test_list_to_string
@@ -25,6 +26,7 @@ class TestInspector < MiniTest::Test
     assert_equal '((1 . 2) 3 . 4)', @rubic.evaluate('(cons (cons 1 2) (cons 3 4))').to_s
     assert_equal '(1 2 3 4)', @rubic.evaluate('(list 1 2 3 4)').to_s
     assert_equal '(a . b)', @rubic.evaluate('(cons "a" "b")').to_s
+    assert_equal '()', @rubic.evaluate('()').inspect
   end
 
   def test_inspect_lambda_expression
@@ -33,5 +35,9 @@ class TestInspector < MiniTest::Test
 
   def test_lambda_to_string
     assert_match /^#<lambda:.*>/, @rubic.evaluate('(lambda (x) x)').to_s
+  end
+
+  def test_inspect_symbol
+    assert_equal 'abc', @rubic.evaluate("'abc").inspect
   end
 end
