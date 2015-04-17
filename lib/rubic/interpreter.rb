@@ -48,17 +48,20 @@ module Rubic
       # Special Forms
       case list.first
       when :define
-        _, name, expr = list
-        env[name] = execute(expr, env)
-        return
-      when :define_proc
-        _, (name, *params), *body = list
-        env[name] = -> (*args) do
-          local = Environment.new(env)
-          local.bind(params, args)
-          execute_sequence(body, local)
+        if list[1].is_a?(Array) # procedure definition
+          _, (name, *params), *body = list
+          env[name] = -> (*args) do
+            local = Environment.new(env)
+            local.bind(params, args)
+            execute_sequence(body, local)
+          end
+          return
+        else # variable definition
+          _, name, expr = list
+          env[name] = execute(expr, env)
+          return
         end
-        return
+
       when :cond
         _, *clauses = list
         clauses.each do |pred, expr|
@@ -67,21 +70,25 @@ module Rubic
           end
         end
         return
+
       when :if
         _, pred, cons, alt = list
         return execute(pred, env) ? execute(cons, env) : execute(alt, env)
+
       when :and
         _, *exprs = list
         exprs.each do |expr|
           return false unless execute(expr, env)
         end
         return true
+
       when :or
         _, *exprs = list
         exprs.each do |expr|
           return true if execute(expr, env)
         end
         return false
+
       when :lambda
         _, (*params), *body = list
         return -> (*args) do
@@ -89,14 +96,17 @@ module Rubic
           local.bind(params, args)
           execute_sequence(body, local)
         end
+
       when :let
         _, (*defs), *body = list
         local = Environment.new(env)
         defs.each {|name, expr| local[name] = execute(expr, env) }
         return execute_sequence(body, local)
+
       when :quote
         _, expr = list
         return quote(expr)
+
       else
         # fallthrough
       end

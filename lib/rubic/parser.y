@@ -22,7 +22,6 @@ rule
         | NUMBER
         | STRING
         | define
-        | define_proc
         | cond
         | if
         | lambda
@@ -49,12 +48,10 @@ rule
             {
               [:define, val[2], val[3]]
             }
-
-  /* Procedure definition */
-  define_proc : '(' KW_DEFINE '(' IDENT params ')' seq ')'
-                {
-                  [:define_proc, [val[3], *val[4]], *val[6]]
-                }
+          | '(' KW_DEFINE '(' IDENT params ')' seq ')'
+            {
+              [:define, [val[3], *val[4]], *val[6]]
+            }
 
   params      : /* empty */
                 {

@@ -41,14 +41,14 @@ class TestParser < MiniTest::Test
   end
 
   def test_parse_procedure_definitions
-    assert_equal [:define_proc, [:square, :x], [:*, :x, :x]],
+    assert_equal [:define, [:square, :x], [:*, :x, :x]],
                  @parser.parse('(define (square x) (* x x))')
-    assert_equal [:define_proc, [:'sum-of-squares', :x, :y], [:+, [:square, :x], [:square, :y]]],
+    assert_equal [:define, [:'sum-of-squares', :x, :y], [:+, [:square, :x], [:square, :y]]],
                  @parser.parse(<<-SCHEME)
       (define (sum-of-squares x y)
         (+ (square x) (square y)))
     SCHEME
-    assert_equal [:define_proc, [:f, :a], [:'sum-of-squares', [:+, :a, 1], [:*, :a, 2]]],
+    assert_equal [:define, [:f, :a], [:'sum-of-squares', [:+, :a, 1], [:*, :a, 2]]],
                  @parser.parse(<<-SCHEME)
       (define (f a)
         (sum-of-squares (+ a 1) (* a 2)))
