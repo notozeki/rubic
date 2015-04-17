@@ -1,30 +1,12 @@
-require 'rubic/parser'
+require 'rubic/builtin'
 require 'rubic/environment'
-require 'rubic/inspector'
+require 'rubic/parser'
 
 module Rubic
   class Interpreter
     DEFAULT_GLOBAL_VARS = {
-      :+ => -> (*args) { args.reduce(:+) },
-      :- => -> (*args) { args.size == 1 ? -args.first : args.reduce(:-) },
-      :* => -> (*args) { args.reduce(:*) },
-      :/ => -> (*args) { args.reduce(:/) },
-
-      :< => -> (a, b) { a < b },
-      :> => -> (a, b) { a > b },
-      :'=' => -> (a, b) { a == b },
       :not => -> (a) { !a },
       :eq? => -> (a, b) { a.equal? b },
-
-      :cons => -> (a, b) { [a, b] },
-      :car => -> (l) { l.first },
-      :cdr => -> (l) { l.last },
-      :list => -> (*args) { args.reverse.reduce([]) {|res, e| [e, res] } },
-      :null? => -> (l) { l.is_a?(Array) ? l.empty? : false },
-      :pair? => -> (l) { l.is_a?(Array) ? l.any? : false },
-
-      :display => -> (a) { print Rubic::Inspector.display(a) },
-      :newline => -> () { puts },
 
       :true => true,
       :false => false,
@@ -35,6 +17,8 @@ module Rubic
       @parser = Parser.new
       @global = Environment.new
       DEFAULT_GLOBAL_VARS.each {|k, v| @global[k] = v }
+      builtins = Rubic::Builtin.constants.map {|c| Rubic::Builtin.const_get(c) }
+      builtins.each {|ext| @global.extend(ext) }
     end
 
     def evaluate(str)
@@ -121,6 +105,10 @@ module Rubic
       op, *args = list.map {|e| execute(e, env) }
       unless op.respond_to? :call
         raise Rubic::RuntimeError, "`#{op}' is not a procedure"
+      end
+      required = op.arity >= 0 ? op.arity : -op.arity - 1
+      if op.arity >= 0 ? required != args.size : required > args.size
+        raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for #{required})"
       end
       op.call(*args)
     end

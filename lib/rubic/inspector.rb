@@ -45,10 +45,5 @@ module Rubic
         to_s
       end
     end
-
-    using self
-    def self.display(obj)
-      obj.to_s
-    end
   end
 end

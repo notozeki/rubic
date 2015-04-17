@@ -29,6 +29,13 @@ module Rubic
       end
     end
 
+    def extend(klass)
+      ext = klass.new
+      klass.instance_methods(false).each do |mname|
+        defvar(mname, ext.method(mname))
+      end
+    end
+
     alias []= defvar
     alias [] refvar
   end
