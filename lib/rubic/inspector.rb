@@ -14,12 +14,35 @@ module Rubic
           "#{first.inspect} . #{last.inspect}"
         end
       end
+
+      def to_s
+        "(#{to_s_rec})"
+      end
+
+      def to_s_rec
+        if empty?
+          ''
+        elsif last.is_a?(Array)
+          [first.to_s, last.to_s_rec].join(' ').strip
+        else
+          "#{first.to_s} . #{last.to_s}"
+        end
+      end
     end
 
     refine Proc do
       def inspect
         "#<lambda:#{object_id}>"
       end
+
+      def to_s
+        "#<lambda:#{object_id}>"
+      end
+    end
+
+    using self
+    def self.display(obj)
+      obj.to_s
     end
   end
 end

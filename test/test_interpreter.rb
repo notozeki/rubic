@@ -238,4 +238,21 @@ class TestInterpreter < Minitest::Test
     assert_equal 4, @rubic.evaluate('(count-leaves x)')
     assert_equal 8, @rubic.evaluate('(count-leaves (list x x))')
   end
+
+  def test_evaluate_output_procedures
+    assert_output('100') { @rubic.evaluate('(display 100)') }
+    assert_output("\n") { @rubic.evaluate('(newline)') }
+
+    @rubic.evaluate('(define (make-rat n d) (cons n d))')
+    @rubic.evaluate('(define (numer x) (car x))')
+    @rubic.evaluate('(define (denom x) (cdr x))')
+    @rubic.evaluate(<<-SCHEME)
+      (define (print-rat x)
+        (newline)
+        (display (numer x))
+        (display "/")
+        (display (denom x)))
+    SCHEME
+    assert_output("\n1/2") { @rubic.evaluate('(print-rat (make-rat 1 2))') }
+  end
 end

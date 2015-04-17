@@ -10,12 +10,13 @@ rule
           {
             [:or, *val[2]]
           }
-        | '(' expr seq ')'
+        | '(' expr opt_seq ')'
           {
             [val[1], *val[2]]
           }
         | IDENT
         | NUMBER
+        | STRING
         | define
         | define_proc
         | cond
@@ -23,14 +24,20 @@ rule
         | lambda
         | let
 
-  seq   : expr
-          {
-            [val[0]]
-          }
-        | seq expr
-          {
-            val[0].push(val[1])
-          }
+  seq     : expr
+            {
+              [val[0]]
+            }
+          | seq expr
+            {
+              val[0].push(val[1])
+            }
+
+  opt_seq : /* empty */
+            {
+              []
+            }
+          | seq
 
   /* Define statement */
   define  : '(' KW_DEFINE IDENT expr ')'
@@ -146,8 +153,10 @@ def next_token
     when 'let'
       [:KW_LET, nil]
     else
-      [:IDENT, @s[0]]
+      [:IDENT, @s[0].to_sym]
     end
+  when @s.scan(/"([^"]*)"/)
+    [:STRING, @s[1]]
   else
     raise Rubic::ParseError, "unknown character #{@s.getch}"
   end

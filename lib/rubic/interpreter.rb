@@ -1,24 +1,27 @@
 require 'rubic/parser'
 require 'rubic/environment'
+require 'rubic/inspector'
 
 module Rubic
   class Interpreter
     DEFAULT_GLOBAL_VARS = {
-      '+' => -> (*args) { args.reduce(:+) },
-      '-' => -> (*args) { args.size == 1 ? -args.first : args.reduce(:-) },
-      '*' => -> (*args) { args.reduce(:*) },
-      '/' => -> (*args) { args.reduce(:/) },
-      '<' => -> (a, b) { a < b },
-      '>' => -> (a, b) { a > b },
-      '=' => -> (a, b) { a == b },
-      'not' => -> (a) { !a },
-      'cons' => -> (a, b) { [a, b] },
-      'car' => -> (l) { l.first },
-      'cdr' => -> (l) { l.last },
-      'nil' => [],
-      'list' => -> (*args) { args.reverse.reduce([]) {|res, e| [e, res] } },
-      'null?' => -> (l) { l.is_a?(Array) ? l.empty? : false },
-      'pair?' => -> (l) { l.is_a?(Array) ? l.any? : false },
+      :+ => -> (*args) { args.reduce(:+) },
+      :- => -> (*args) { args.size == 1 ? -args.first : args.reduce(:-) },
+      :* => -> (*args) { args.reduce(:*) },
+      :/ => -> (*args) { args.reduce(:/) },
+      :< => -> (a, b) { a < b },
+      :> => -> (a, b) { a > b },
+      :'=' => -> (a, b) { a == b },
+      :not => -> (a) { !a },
+      :cons => -> (a, b) { [a, b] },
+      :car => -> (l) { l.first },
+      :cdr => -> (l) { l.last },
+      :nil => [],
+      :list => -> (*args) { args.reverse.reduce([]) {|res, e| [e, res] } },
+      :null? => -> (l) { l.is_a?(Array) ? l.empty? : false },
+      :pair? => -> (l) { l.is_a?(Array) ? l.any? : false },
+      :display => -> (a) { print Rubic::Inspector.display(a) },
+      :newline => -> () { puts },
     }
 
     def initialize
@@ -37,9 +40,9 @@ module Rubic
     def execute(list_or_atom, env)
       # Atom
       case list_or_atom
-      when Float, Integer
+      when Float, Integer, String
         atom = list_or_atom
-      when String
+      when Symbol
         atom = env[list_or_atom]
       else
         # fallthrough
