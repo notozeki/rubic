@@ -6,22 +6,36 @@ require 'readline'
 
 using Rubic::Inspector
 
-# TODO: read the code from file when argument passed
+if ARGV.size == 1
+  file = ARGV.shift
+  File.open(file) do |f|
+    rubic = Rubic::Interpreter.new
 
-puts "Welcome to interactive Rubic (v#{Rubic::VERSION})"
-puts 'Hit ^D to exit'
-
-rubic = Rubic::Interpreter.new
-
-while input = Readline.readline(">> ", true)
-  next if input.empty?
-  while input.count('(') > input.count(')')
-    input << Readline.readline(' | ', true)
+    begin
+      rubic.evaluate(f.read)
+    rescue Rubic::RubicError => e
+      puts "\e[31mError: #{e.message}\e[0m"
+      exit false
+    end
   end
+else
+  # REPL mode
 
-  begin
-    puts '=> ' + rubic.evaluate(input).inspect
-  rescue Rubic::RubicError => e
-    puts "\e[31mError: #{e.message}\e[0m"
+  puts "Welcome to interactive Rubic (v#{Rubic::VERSION})"
+  puts 'Hit ^D to exit'
+
+  rubic = Rubic::Interpreter.new
+
+  while input = Readline.readline(">> ", true)
+    next if input.empty?
+    while input.count('(') > input.count(')')
+      input << Readline.readline(' | ', true)
+    end
+
+    begin
+      puts '=> ' + rubic.evaluate(input).inspect
+    rescue Rubic::RubicError => e
+      puts "\e[31mError: #{e.message}\e[0m"
+    end
   end
 end

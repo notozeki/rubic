@@ -218,4 +218,11 @@ class TestInterpreter < Minitest::Test
     refute @rubic.evaluate("(memq 'apple '(pear banana prune))")
     assert_equal [:apple, [:pear, []]], @rubic.evaluate("(memq 'apple '(x (apple sauce) y apple pear))")
   end
+
+  def test_evaluate_sequence
+    assert_equal 100, @rubic.evaluate(<<-SCHEME)
+      (define x 100)
+      x
+    SCHEME
+  end
 end

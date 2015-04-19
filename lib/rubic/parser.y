@@ -2,6 +2,8 @@ class Parser
   options no_result_var
 
 rule
+  program : opt_seq
+
   expr  : '(' KW_AND seq ')'
           {
             [:and, *val[2]]

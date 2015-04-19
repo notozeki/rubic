@@ -22,8 +22,8 @@ module Rubic
     end
 
     def evaluate(str)
-      list = @parser.parse(str)
-      execute(list, @global)
+      seq = @parser.parse(str)
+      execute_sequence(seq, @global)
     end
 
     private
