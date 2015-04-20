@@ -26,9 +26,24 @@ Or install it yourself as:
 
 ## Usage
 
+Once you install this gem, the `rubic` executable can be used. Simply run it as:
+
+    $ rubic
+
+then the <abbr title="Read-Eval-Print Loop">REPL</abbr> will start. Or pass the Scheme source file as:
+
+    $ rubic /path/to/your_code.scm
+
+then the program will be executed.
+
+You can also evaluate Scheme code from your Ruby application:
+
 ```ruby
+require 'rubic'
 rubic = Rubic::Interpreter.new
-rubic.evaluate("...write your Scheme code here...")
+rubic.evaluate('(define x 100)')
+rubic.evaluate('(+ x 3)')        # => 103
+rubic.evaluate('(list 1 2 3)')   # => [1, [2, [3, []]]
 ```
 
 ## Development
