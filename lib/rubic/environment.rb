@@ -19,6 +19,16 @@ module Rubic
       end
     end
 
+    def assign(name, value)
+      if @table.key? name
+        @table[name] = value
+      elsif @outer
+        @outer.assign(name, value)
+      else
+        raise Rubic::NameError, "undefined variable `#{name}'"
+      end
+    end
+
     def bind(params, args)
       if params.size != args.size
         raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for #{params.size})"

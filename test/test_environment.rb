@@ -50,4 +50,19 @@ class TestEnvironment < MiniTest::Test
       @env.refvar(:method2)
     end
   end
+
+  def test_assignment
+    @env.defvar(:x, 0)
+    @env.assign(:x, 100)
+    assert_equal 100, @env.refvar(:x)
+
+    local = ::Rubic::Environment.new(@env)
+    local.assign(:x, 200)
+    assert_equal 200, local.refvar(:x)
+    assert_equal 200, @env.refvar(:x)
+
+    assert_raises ::Rubic::NameError do
+      local.assign(:y, 100)
+    end
+  end
 end

@@ -225,4 +225,20 @@ class TestInterpreter < Minitest::Test
       x
     SCHEME
   end
+
+  def test_evaluate_set_expression
+    assert_equal 100, @rubic.evaluate(<<-SCHEME)
+      (define x 100)
+      (define (a) (define x 101))
+      (a)
+      x
+    SCHEME
+
+    assert_equal 101, @rubic.evaluate(<<-SCHEME)
+      (define x 100)
+      (define (b) (set! x 101))
+      (b)
+      x
+    SCHEME
+  end
 end

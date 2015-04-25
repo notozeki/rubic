@@ -107,6 +107,11 @@ module Rubic
         _, expr = list
         return quote(expr)
 
+      when :set!
+        _, name, expr = list
+        env.assign(name, execute(expr, env))
+        return
+
       else
         # fallthrough
       end

@@ -29,6 +29,7 @@ rule
         | lambda
         | let
         | quote
+        | set
 
   seq     : expr
             {
@@ -123,6 +124,12 @@ rule
           {
             [:quote, val[1]]
           }
+
+  /* set expression */
+  set : '(' KW_SET_BANG IDENT expr ')'
+        {
+          [:set!, val[2], val[3]]
+        }
 end
 
 ---- header
@@ -132,7 +139,7 @@ module Rubic
 
 ---- inner
 EOT = [false, nil] # end of token
-SYM_CHARS = Regexp.escape("+-*/<>=?")
+SYM_CHARS = Regexp.escape("+-*/<>=!?")
 
 def parse(str)
   @s = StringScanner.new(str)
@@ -168,6 +175,8 @@ def next_token
       [:KW_LET, nil]
     when 'quote'
       [:KW_QUOTE, nil]
+    when 'set!'
+      [:KW_SET_BANG, nil]
     else
       [:IDENT, @s[0].to_sym]
     end
