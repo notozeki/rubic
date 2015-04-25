@@ -3,18 +3,38 @@
 require 'rubic'
 require 'rubic/inspector'
 require 'readline'
+require 'optparse'
 
 using Rubic::Inspector
+
+def error(str)
+  $stderr.puts "\e[31m#{str}\e[0m"
+end
+
+
+rubic = Rubic::Interpreter.new
+
+opts = OptionParser.new
+opts.version = Rubic::VERSION
+opts.on('-r FILE', 'load FILE at startup') do |file|
+  File.open(file) do |f|
+    begin
+      rubic.evaluate(f.read)
+    rescue Rubic::RubicError => e
+      error "Error: #{e.message}"
+      exit false
+    end
+  end
+end
+opts.parse!(ARGV)
 
 if ARGV.size == 1
   file = ARGV.shift
   File.open(file) do |f|
-    rubic = Rubic::Interpreter.new
-
     begin
       rubic.evaluate(f.read)
     rescue Rubic::RubicError => e
-      puts "\e[31mError: #{e.message}\e[0m"
+      error "Error: #{e.message}"
       exit false
     end
   end
@@ -23,8 +43,6 @@ else
 
   puts "Welcome to interactive Rubic (v#{Rubic::VERSION})"
   puts 'Hit ^D to exit'
-
-  rubic = Rubic::Interpreter.new
 
   while input = Readline.readline(">> ", true)
     next if input.empty?
@@ -35,7 +53,7 @@ else
     begin
       puts '=> ' + rubic.evaluate(input).inspect
     rescue Rubic::RubicError => e
-      puts "\e[31mError: #{e.message}\e[0m"
+      error "Error: #{e.message}"
     end
   end
 end
