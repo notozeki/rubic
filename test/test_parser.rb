@@ -138,4 +138,11 @@ class TestParser < MiniTest::Test
     assert_equal [:set!, :x, 100], parse_expr('(set! x 100)')
     assert_equal [:set!, :x, [:+, 2, 3]], parse_expr('(set! x (+ 2 3))')
   end
+
+  def test_parse_begin_expression
+    assert_equal [:begin, [:set!, :x, 5], [:+, :x, 1]], parse_expr(<<-SCHEME)
+      (begin (set! x 5)
+             (+ x 1))
+    SCHEME
+  end
 end

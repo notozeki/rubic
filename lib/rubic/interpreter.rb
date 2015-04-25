@@ -112,6 +112,10 @@ module Rubic
         env.assign(name, execute(expr, env))
         return
 
+      when :begin
+        _, *seq = list
+        return execute_sequence(seq, env)
+
       else
         # fallthrough
       end

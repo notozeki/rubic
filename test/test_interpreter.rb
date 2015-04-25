@@ -241,4 +241,17 @@ class TestInterpreter < Minitest::Test
       x
     SCHEME
   end
+
+  def test_evaluate_begin_expression
+    assert_equal 6, @rubic.evaluate(<<-SCHEME)
+      (define x 0)
+      (begin (set! x 5)
+             (+ x 1))
+    SCHEME
+
+    assert_output('4 plus 1 equals 5') { @rubic.evaluate(<<-SCHEME) }
+      (begin (display "4 plus 1 equals ")
+             (display (+ 4 1)))
+    SCHEME
+  end
 end

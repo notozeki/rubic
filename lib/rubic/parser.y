@@ -30,6 +30,7 @@ rule
         | let
         | quote
         | set
+        | begin
 
   seq     : expr
             {
@@ -130,6 +131,12 @@ rule
         {
           [:set!, val[2], val[3]]
         }
+
+  /* begin expression */
+  begin : '(' KW_BEGIN seq ')'
+          {
+            [:begin, *val[2]]
+          }
 end
 
 ---- header
@@ -177,6 +184,8 @@ def next_token
       [:KW_QUOTE, nil]
     when 'set!'
       [:KW_SET_BANG, nil]
+    when 'begin'
+      [:KW_BEGIN, nil]
     else
       [:IDENT, @s[0].to_sym]
     end
