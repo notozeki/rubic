@@ -3,6 +3,7 @@ require 'rake/testtask'
 
 Rake::TestTask.new do |t|
   t.libs << 'test'
+  t.pattern = 'test/**/test_*.rb'
 end
 
 file 'lib/rubic/parser.rb' => 'lib/rubic/parser.y' do |t|
