@@ -5,14 +5,9 @@ Rake::TestTask.new do |t|
   t.libs << 'test'
 end
 
-namespace :racc do
-  desc 'Compile syntax file'
-  task :compile do
-    src = 'lib/rubic/parser.y'
-    dst = 'lib/rubic/parser.rb'
-    sh "bundle exec racc -o #{dst} #{src}"
-  end
+file 'lib/rubic/parser.rb' => 'lib/rubic/parser.y' do |t|
+  sh "bundle exec racc -o #{t.name} #{t.prerequisites.first}"
 end
 
-task :test => 'racc:compile'
+task :test => 'lib/rubic/parser.rb'
 task :default => :test
