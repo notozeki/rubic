@@ -104,7 +104,7 @@ def next_token
     when @s.scan(/[@.0-9a-f\/]/i)
       [@s[0].downcase, @s[0].downcase]
     else
-      @lex_state = :num_suffix
+      @lex_state = :num_wrapup
       next_token
     end
 
@@ -113,23 +113,15 @@ def next_token
     when @s.scan(/[-+@.0-9a-fi\/]/i)
       [@s[0].downcase, @s[0].downcase]
     else
-      @lex_state = :num_suffix
+      @lex_state = :num_wrapup
       next_token
     end
 
-  when :num_suffix
+  when :num_wrapup
     case
     when @s.eos? || @s.check(/[\s()";]/) # separator characters
       @lex_state = :start
       [:NUM_END, nil]
-    when @s.scan(/ie/i) # i is imaginary, e is exponent marker
-      [@s[0].downcase, @s[0].downcase]
-    when @s.scan(/\+/)
-      [U_PLUS, '+']
-    when @s.scan(/-/)
-      [U_MINUS, '-']
-    when @s.scan(/[0-9]/)
-      [@s[0], @s[0]]
     else
       @lex_state = :start
       next_token
