@@ -145,4 +145,58 @@ class TestParser < MiniTest::Test
              (+ x 1))
     SCHEME
   end
+
+  def test_parse_exact_number
+    assert_equal 123, parse_expr('123')
+    assert_equal 123, parse_expr('+123')
+    assert_equal -123, parse_expr('-123')
+
+    assert_equal 123, parse_expr('#b1111011')
+    assert_equal 123, parse_expr('#o173')
+    assert_equal 123, parse_expr('#d123')
+    assert_equal 123, parse_expr('#x7b')
+    assert_equal 123, parse_expr('#x7B')
+    assert_equal -123, parse_expr('#x-7b')
+
+    assert_equal 123, parse_expr('#e123')
+    assert_equal 123, parse_expr('#e#d123')
+    assert_equal 123, parse_expr('#d#e123')
+  end
+
+  def test_parse_inexact_number
+    assert_equal 0.6, parse_expr('0.6')
+    assert_equal 0.6, parse_expr('+0.6')
+    assert_equal -0.6, parse_expr('-0.6')
+
+    assert_equal 123.0, parse_expr('#i123')
+    assert_equal 100.0, parse_expr('1.0e2')
+    assert_equal 100.0, parse_expr('1.0e+2')
+    assert_equal 0.01, parse_expr('1.0e-2')
+    assert_equal -100.0, parse_expr('-1.0e2')
+  end
+
+  def test_parse_rational_number
+    assert_equal 1/2r, parse_expr('1/2')
+    assert_equal -1/2r, parse_expr('-1/2')
+    assert_equal 1/123r, parse_expr('#b1/1111011')
+    assert_equal 1/123r, parse_expr('#o1/173')
+    assert_equal 1/123r, parse_expr('#d1/123')
+    assert_equal 1/123r, parse_expr('#x1/7b')
+    assert_equal 1/123r, parse_expr('#x1/7B')
+    assert_equal -1/123r, parse_expr('#x-1/7b')
+  end
+
+  def test_parse_complex_number
+    assert_equal Complex(1.0, 2.0), parse_expr('1+2i')
+    assert_equal Complex(1.0, -2.0), parse_expr('1-2i')
+    assert_equal Complex(1.0, 1.0), parse_expr('1+i')
+    assert_equal Complex(1.0, -1.0), parse_expr('1-i')
+    assert_equal Complex(0.0, 2.0), parse_expr('+2i')
+    assert_equal Complex(0.0, -2.0), parse_expr('-2i')
+    assert_equal Complex(0.0, 1.0), parse_expr('+i')
+    assert_equal Complex(0.0, -1.0), parse_expr('-i')
+    assert_equal Complex(2.2, -1.1), parse_expr('2.2-1.1i')
+    assert_equal 2.0, parse_expr('2+0i')
+    assert_equal Complex.polar(2.0, 2.0), parse_expr('2@2')
+  end
 end
