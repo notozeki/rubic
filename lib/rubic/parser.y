@@ -249,129 +249,20 @@ rule
 end
 
 ---- header
-require 'strscan'
+require 'rubic/lexer'
 
 module Rubic
 
 ---- inner
-EOT = [false, nil] # end of token
-SYM_CHARS = Regexp.escape("+-*/<>=!?")
-
 def parse(str)
-  @s = StringScanner.new(str)
-  @lex_state = :start
+  @lexer = Rubic::Lexer.new(str)
   do_parse
 end
 
+private
+
 def next_token
-  case @lex_state
-  when :start
-    @s.skip(/\s+/)
-    return EOT if @s.eos?
-
-    case
-    when @s.check(/[+-]?[.0-9]|[+-]i/)
-      @lex_state = :num_char
-      next_token
-
-    when @s.check(/#/)
-      @lex_state = :num_prefix
-      next_token
-
-    when @s.scan(/[()']/)
-      [@s[0], nil]
-
-    when @s.scan(/[A-Za-z_#{SYM_CHARS}][A-Za-z0-9_#{SYM_CHARS}]*/o)
-      case @s[0] # keyword check
-      when 'define'
-        [:KW_DEFINE, nil]
-      when 'cond'
-        [:KW_COND, nil]
-      when 'else'
-        [:KW_ELSE, nil]
-      when 'if'
-        [:KW_IF, nil]
-      when 'and'
-        [:KW_AND, nil]
-      when 'or'
-        [:KW_OR, nil]
-      when 'lambda'
-        [:KW_LAMBDA, nil]
-      when 'let'
-        [:KW_LET, nil]
-      when 'quote'
-        [:KW_QUOTE, nil]
-      when 'set!'
-        [:KW_SET_BANG, nil]
-      when 'begin'
-        [:KW_BEGIN, nil]
-      else
-        [:IDENT, @s[0].to_sym]
-      end
-
-    when @s.scan(/"([^"]*)"/)
-      [:STRING, @s[1]]
-
-    else
-      raise Rubic::ParseError, "unknown character #{@s.getch}"
-
-    end
-
-  when :num_prefix
-    case
-    when @s.scan(/#[eibodx]/)
-      {
-        '#e' => [:NUM_PREFIX_E, true],
-        '#i' => [:NUM_PREFIX_I, false],
-        '#b' => [:NUM_PREFIX_B, nil],
-        '#o' => [:NUM_PREFIX_O, nil],
-        '#d' => [:NUM_PREFIX_D, nil],
-        '#x' => [:NUM_PREFIX_X, nil],
-      }[@s[0]]
-    else
-      @lex_state = :num_char
-      next_token
-    end
-
-  when :num_char
-    case
-    when @s.check(/[+-]?[.0-9a-f\/]*i/i) # complex
-      @lex_state = :num_char_complex
-      next_token
-    when @s.scan(/\+/)
-      [:U_PLUS, '+']
-    when @s.scan(/-/)
-      [:U_MINUS, '-']
-    when @s.scan(/[@.0-9a-f\/]/i)
-      [@s[0].downcase, @s[0].downcase]
-    else
-      @lex_state = :num_wrapup
-      next_token
-    end
-
-  when :num_char_complex
-    case
-    when @s.scan(/[-+@.0-9a-fi\/]/i)
-      [@s[0].downcase, @s[0].downcase]
-    else
-      @lex_state = :num_wrapup
-      next_token
-    end
-
-  when :num_wrapup
-    case
-    when @s.eos? || @s.check(/[\s()";]/) # separator characters
-      @lex_state = :start
-      [:NUM_END, nil]
-    else
-      @lex_state = :start
-      next_token
-    end
-
-  else # NOT REACHED
-    raise "unknown state: #{@lex_state}"
-
-  end
+  @lexer.next_token
 end
 
 def on_error(t, val, vstack)
