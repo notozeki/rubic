@@ -62,4 +62,22 @@ class TestNumber < MiniTest::Test
       @rubic.evaluate('(= (list 1) (list 1))')
     end
   end
+
+  def test_predicates
+    assert @rubic.evaluate('(number? 3+4i)')
+    assert @rubic.evaluate('(number? 3)')
+    assert @rubic.evaluate('(complex? 3+4i)')
+    assert @rubic.evaluate('(complex? 3)')
+    assert @rubic.evaluate('(real? 3)')
+    assert @rubic.evaluate('(real? -2.5+0.0i)')
+    assert @rubic.evaluate('(real? #e1e10)')
+    assert @rubic.evaluate('(rational? 6/10)')
+    assert @rubic.evaluate('(rational? 6/3)')
+    assert @rubic.evaluate('(integer? 3+0i)')
+    assert @rubic.evaluate('(integer? 3.0)')
+    assert @rubic.evaluate('(integer? 8/4)')
+
+    refute @rubic.evaluate("(number? 'abc)")
+    refute @rubic.evaluate('(number? (list 1))')
+  end
 end

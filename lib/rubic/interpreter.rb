@@ -31,7 +31,7 @@ module Rubic
     def execute(list_or_atom, env)
       # Atom
       case list_or_atom
-      when Float, Integer, String
+      when Numeric, String
         atom = list_or_atom
       when Symbol
         atom = env[list_or_atom]

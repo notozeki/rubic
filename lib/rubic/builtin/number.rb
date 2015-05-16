@@ -73,7 +73,27 @@ module Rubic
       end
 
       def number?(suspect)
-        suspect.is_a?(Integer) || suspect.is_a?(Float)
+        suspect.is_a?(Numeric) || complex?(suspect)
+      end
+
+      def complex?(suspect)
+        suspect.is_a?(Complex) || real?(suspect)
+      end
+
+      def real?(suspect)
+        suspect.is_a?(Float) || rational?(suspect)
+      end
+
+      def rational?(suspect)
+        suspect.is_a?(Rational) || integer?(suspect)
+      end
+
+      def integer?(suspect)
+        if suspect.is_a?(Float)
+          suspect == suspect.truncate # X.0
+        else
+          suspect.is_a?(Integer)
+        end
       end
     end
   end
