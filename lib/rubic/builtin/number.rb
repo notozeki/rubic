@@ -2,12 +2,7 @@ module Rubic
   module Builtin
     class Number
       def +(*args)
-        args.reduce(0) do |res, i|
-          unless number? i
-            raise Rubic::TypeError, "operation `+' is not defined between `#{res}' and `#{i}'"
-          end
-          res + i
-        end
+        transitive_operation('+', 0, args) {|a, b| a + b }
       end
 
       def -(*args)
@@ -17,22 +12,12 @@ module Rubic
         when 1
           -args.first
         else
-          args.reduce do |res, i|
-            unless number? i
-              raise Rubic::TypeError, "operation `-' is not defined between `#{res}' and `#{i}'"
-            end
-            res - i
-          end
+          transitive_operation('-', args) {|a, b| a - b }
         end
       end
 
       def *(*args)
-        args.reduce(1) do |res, i|
-          unless number? i
-            raise Rubic::TypeError, "operation `*' is not defined between `#{res}' and `#{i}'"
-          end
-          res * i
-        end
+        transitive_operation('*', 1, args) {|a, b| a * b }
       end
 
       def /(*args)
@@ -42,34 +27,63 @@ module Rubic
         when 1
           1 / args.first
         else
-          args.reduce do |res, i|
-            unless number? i
-              raise Rubic::TypeError, "operation `/' is not defined between `#{res}' and `#{i}'"
-            end
-            res / i
+          transitive_operation('/', args) {|a, b| a / b }
+        end
+      end
+
+      define_method '=' do |*args|
+        if args.size < 2
+          raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for 2+)"
+        else
+          transitive_operation('=', args) do |a, b|
+            (a == b) ? b : (return false)
           end
+          true
         end
       end
 
-      def <(a, b)
-        unless number?(a) && number?(b)
-          raise Rubic::TypeError, "operation `<' is not defined between `#{a}' and `#{b}'"
+      def >(*args)
+        if args.size < 2
+          raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for 2+)"
+        else
+          transitive_operation('>', args) do |a, b|
+            (a > b) ? b : (return false)
+          end
+          true
         end
-        a < b
       end
 
-      def >(a, b)
-        unless number?(a) && number?(b)
-          raise Rubic::TypeError, "operation `>' is not defined between `#{a}' and `#{b}'"
+      def <(*args)
+        if args.size < 2
+          raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for 2+)"
+        else
+          transitive_operation('<', args) do |a, b|
+            (a < b) ? b : (return false)
+          end
+          true
         end
-        a > b
       end
 
-      define_method '=' do |a, b|
-        unless number?(a) && number?(b)
-          raise Rubic::TypeError, "operation `=' is not defined between `#{a}' and `#{b}'"
+      def >=(*args)
+        if args.size < 2
+          raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for 2+)"
+        else
+          transitive_operation('>=', args) do |a, b|
+            (a >= b) ? b : (return false)
+          end
+          true
         end
-        a == b
+      end
+
+      def <=(*args)
+        if args.size < 2
+          raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for 2+)"
+        else
+          transitive_operation('<=', args) do |a, b|
+            (a <= b) ? b : (return false)
+          end
+          true
+        end
       end
 
       def number?(suspect)
@@ -113,6 +127,18 @@ module Rubic
 
       def inexact?(suspect)
         number?(suspect) && !exact?(suspect)
+      end
+
+      private
+
+      def transitive_operation(opname, initial=nil, args)
+        initial = args.shift if initial.nil?
+        args.reduce(initial) do |res, num|
+          unless number?(num)
+            raise Rubic::TypeError, "operation `#{opname}' is not defined between `#{res}' and `#{num}'"
+          end
+          yield res, num
+        end
       end
     end
   end

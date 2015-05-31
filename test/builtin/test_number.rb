@@ -39,19 +39,46 @@ class TestNumber < MiniTest::Test
   end
 
   def test_comparators
+    assert @rubic.evaluate('(= 10 10)')
+    refute @rubic.evaluate('(= 10 11)')
+    assert @rubic.evaluate('(= 10 10 10)')
+    refute @rubic.evaluate('(= 10 11 10)')
+
     refute @rubic.evaluate('(< 10 9)')
     refute @rubic.evaluate('(< 10 10)')
     assert @rubic.evaluate('(< 10 11)')
+    assert @rubic.evaluate('(< 9 10 11)')
+    refute @rubic.evaluate('(< 9 10 10)')
 
     assert @rubic.evaluate('(> 10 9)')
     refute @rubic.evaluate('(> 10 10)')
     refute @rubic.evaluate('(> 10 11)')
+    assert @rubic.evaluate('(> 11 10 9)')
+    refute @rubic.evaluate('(> 11 11 10)')
 
-    assert @rubic.evaluate('(= 10 10)')
-    refute @rubic.evaluate('(= 10 11)')
+    refute @rubic.evaluate('(<= 10 9)')
+    assert @rubic.evaluate('(<= 10 10)')
+    assert @rubic.evaluate('(<= 10 11)')
+    assert @rubic.evaluate('(<= 9 10 11)')
+    assert @rubic.evaluate('(<= 9 10 10)')
+    refute @rubic.evaluate('(<= 9 10 9)')
+
+    assert @rubic.evaluate('(>= 10 9)')
+    assert @rubic.evaluate('(>= 10 10)')
+    refute @rubic.evaluate('(>= 10 11)')
+    assert @rubic.evaluate('(>= 11 10 9)')
+    assert @rubic.evaluate('(>= 11 11 10)')
+    refute @rubic.evaluate('(>= 11 10 11)')
   end
 
   def test_invalid_comparision
+    assert_raises ::Rubic::ArgumentError do
+      @rubic.evaluate('(=)')
+    end
+    assert_raises ::Rubic::ArgumentError do
+      @rubic.evaluate('(= 1)')
+    end
+
     assert_raises ::Rubic::TypeError do
       @rubic.evaluate('(< (list 1) (list 2))')
     end
