@@ -95,6 +95,25 @@ module Rubic
           suspect.is_a?(Integer)
         end
       end
+
+      def exact?(suspect)
+        case
+        when integer?(suspect)
+          true
+        when rational?(suspect)
+          true
+        when real?(suspect)
+          false
+        when complex?(suspect)
+          exact?(suspect.real) && exact?(suspect.imag)
+        else
+          false
+        end
+      end
+
+      def inexact?(suspect)
+        number?(suspect) && !exact?(suspect)
+      end
     end
   end
 end

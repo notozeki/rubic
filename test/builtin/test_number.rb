@@ -80,4 +80,23 @@ class TestNumber < MiniTest::Test
     refute @rubic.evaluate("(number? 'abc)")
     refute @rubic.evaluate('(number? (list 1))')
   end
+
+  def test_exactness_predicates
+    assert @rubic.evaluate('(exact? 1)')
+    assert @rubic.evaluate('(exact? 1.0)')
+    refute @rubic.evaluate('(exact? 0.1)')
+    assert @rubic.evaluate('(exact? 1/2)')
+    assert @rubic.evaluate('(exact? 3+4i)')
+    refute @rubic.evaluate('(exact? 0.5+2i)')
+
+    refute @rubic.evaluate('(inexact? 1)')
+    refute @rubic.evaluate('(inexact? 1.0)')
+    assert @rubic.evaluate('(inexact? 0.1)')
+    refute @rubic.evaluate('(inexact? 1/2)')
+    refute @rubic.evaluate('(inexact? 3+4i)')
+    assert @rubic.evaluate('(inexact? 0.5+2i)')
+
+    refute @rubic.evaluate("(exact? 'abc)")
+    refute @rubic.evaluate("(inexact? 'abc)")
+  end
 end
