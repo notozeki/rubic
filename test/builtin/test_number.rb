@@ -189,6 +189,35 @@ class TestNumber < MiniTest::Test
     end
   end
 
+  def test_integer_division_procedures
+    assert_equal 3, @rubic.evaluate('(quotient 13 4)')
+    assert_equal -3, @rubic.evaluate('(quotient -13 4)')
+    assert_equal -3, @rubic.evaluate('(quotient 13 -4)')
+    assert_equal 3, @rubic.evaluate('(quotient -13 -4)')
+    assert_same 3.0, @rubic.evaluate('(quotient -13 -4.0)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(quotient 13.1 4)')
+    end
+
+    assert_equal 1, @rubic.evaluate('(modulo 13 4)')
+    assert_equal 3, @rubic.evaluate('(modulo -13 4)')
+    assert_equal -3, @rubic.evaluate('(modulo 13 -4)')
+    assert_equal -1, @rubic.evaluate('(modulo -13 -4)')
+    assert_same -1.0, @rubic.evaluate('(modulo -13 -4.0)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(modulo 13.1 4)')
+    end
+
+    assert_equal 1, @rubic.evaluate('(remainder 13 4)')
+    assert_equal -1, @rubic.evaluate('(remainder -13 4)')
+    assert_equal 1, @rubic.evaluate('(remainder 13 -4)')
+    assert_equal -1, @rubic.evaluate('(remainder -13 -4)')
+    assert_same -1.0, @rubic.evaluate('(remainder -13 -4.0)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(remainder 13.1 4)')
+    end
+  end
+
   def test_exactness_converters
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')

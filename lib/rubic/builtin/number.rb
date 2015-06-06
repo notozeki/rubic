@@ -134,44 +134,34 @@ module Rubic
       end
 
       def zero?(suspect)
-        unless number?(suspect)
-          raise Rubic::TypeError, "`#{suspect}' is not a number"
-        end
+        ensure_number suspect
         suspect.zero?
       end
 
       def positive?(suspect)
-        unless real?(suspect)
-          raise Rubic::TypeError, "`#{suspect}' is not a real number"
-        end
+        ensure_real suspect
         suspect > 0.0
       end
 
       def negative?(suspect)
-        unless real?(suspect)
-          raise Rubic::TypeError, "`#{suspect}' is not a real number"
-        end
+        ensure_real suspect
         suspect < 0.0
       end
 
       def odd?(suspect)
-        unless integer?(suspect)
-          raise Rubic::TypeError, "`#{suspect}' is not an integer"
-        end
+        ensure_integer suspect
         suspect.to_i.odd?
       end
 
       def even?(suspect)
-        unless integer?(suspect)
-          raise Rubic::TypeError, "`#{suspect}' is not an integer"
-        end
+        ensure_integer suspect
         suspect.to_i.even?
       end
 
       def max(a, *args)
         args.unshift(a)
         exact = args.all? do |e|
-          raise Rubic::TypeError, "`#{e}' is not a real number" unless real?(e)
+          ensure_real e
           exact?(e)
         end
         exact ? args.max : exact_to_inexact(args.max)
@@ -180,25 +170,43 @@ module Rubic
       def min(a, *args)
         args.unshift(a)
         exact = args.all? do |e|
-          raise Rubic::TypeError, "`#{e}' is not a real number" unless real?(e)
+          ensure_real e
           exact?(e)
         end
         exact ? args.min : exact_to_inexact(args.min)
       end
 
       def abs(num)
-        raise Rubic::TypeError, "`#{num}' is not a number" unless number?(num)
+        ensure_number num
         num.abs
       end
 
+      def quotient(a, b)
+        ensure_integer a, b
+        ret = a.quo(b).round
+        exact?(a) && exact?(b) ? ret : exact_to_inexact(ret)
+      end
+
+      def modulo(a, b)
+        ensure_integer a, b
+        ret = a.modulo(b)
+        exact?(a) && exact?(b) ? ret : exact_to_inexact(ret)
+      end
+
+      def remainder(a, b)
+        ensure_integer a, b
+        ret = a.remainder(b)
+        exact?(a) && exact?(b) ? ret : exact_to_inexact(ret)
+      end
+
       define_method 'inexact->exact' do |num|
-        raise Rubic::TypeError, "`#{num}' is not a number" unless number?(num)
+        ensure_number num
         return num if exact?(num)
         inexact_to_exact(num)
       end
 
       define_method 'exact->inexact' do |num|
-        raise Rubic::TypeError, "`#{num}' is not a number" unless number?(num)
+        ensure_number num
         return num unless exact?(num)
         exact_to_inexact(num)
       end
@@ -214,6 +222,25 @@ module Rubic
           yield res, num
         end
       end
+
+      def ensure_number(*args)
+        args.each do |e|
+          raise Rubic::TypeError, "`#{e}' is not a number" unless number?(e)
+        end
+      end
+
+      def ensure_real(*args)
+        args.each do |e|
+          raise Rubic::TypeError, "`#{e}' is not a real number" unless real?(e)
+        end
+      end
+
+      def ensure_integer(*args)
+        args.each do |e|
+          raise Rubic::TypeError, "`#{e}' is not an integer" unless integer?(e)
+        end
+      end
+
     end
   end
 end
