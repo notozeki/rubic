@@ -144,20 +144,20 @@ rule
           | hexadecimal NUM_END { val[0] }
 
   binary    : b_prefix b_complex
-              { val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) }
+              { val[0].nil? ? val[1] : (val[0] ? inexact_to_exact(val[1]) : exact_to_inexact(val[1])) }
   b_complex : b_real
-            | b_real '@' b_real      { normalize Complex.polar(val[0], val[2]) }
-            | b_real '+' b_ureal 'i' { normalize Complex(val[0], val[2]) }
-            | b_real '-' b_ureal 'i' { normalize Complex(val[0], -val[2]) }
+            | b_real '@' b_real      { normalize_number Complex.polar(val[0], val[2]) }
+            | b_real '+' b_ureal 'i' { normalize_number Complex(val[0], val[2]) }
+            | b_real '-' b_ureal 'i' { normalize_number Complex(val[0], -val[2]) }
             | b_real '+' 'i'         { Complex(val[0], 1) }
             | b_real '-' 'i'         { Complex(val[0], -1) }
-            | '+' b_ureal 'i'        { normalize Complex(0, val[1]) }
-            | '-' b_ureal 'i'        { normalize Complex(0, -val[1]) }
+            | '+' b_ureal 'i'        { normalize_number Complex(0, val[1]) }
+            | '-' b_ureal 'i'        { normalize_number Complex(0, -val[1]) }
             | '+' 'i'                { Complex(0, 1) }
             | '-' 'i'                { Complex(0, -1) }
   b_real    : sign b_ureal           { val[0] == '-' ? -val[1] : val[1] }
   b_ureal   : b_uint
-            | b_uint '/' b_uint      { normalize Rational(val[0], val[2]) }
+            | b_uint '/' b_uint      { normalize_number Rational(val[0], val[2]) }
   b_uint    : b_chars                { val[0].to_i(2) }
   b_chars   : b_char
             | b_chars b_char         { val[0] << val[1] }
@@ -166,20 +166,20 @@ rule
             | exactness NUM_PREFIX_B { val[0] }
 
   octal     : o_prefix o_complex
-              { val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) }
+              { val[0].nil? ? val[1] : (val[0] ? inexact_to_exact(val[1]) : exact_to_inexact(val[1])) }
   o_complex : o_real
-            | o_real '@' o_real      { normalize Complex.polar(val[0], val[2]) }
-            | o_real '+' o_ureal 'i' { normalize Complex(val[0], val[2]) }
-            | o_real '-' o_ureal 'i' { normalize Complex(val[0], -val[2]) }
+            | o_real '@' o_real      { normalize_number Complex.polar(val[0], val[2]) }
+            | o_real '+' o_ureal 'i' { normalize_number Complex(val[0], val[2]) }
+            | o_real '-' o_ureal 'i' { normalize_number Complex(val[0], -val[2]) }
             | o_real '+' 'i'         { Complex(val[0], 1) }
             | o_real '-' 'i'         { Complex(val[0], -1) }
-            | '+' o_ureal 'i'        { normalize Complex(0, val[1]) }
-            | '-' o_ureal 'i'        { normalize Complex(0, -val[1]) }
+            | '+' o_ureal 'i'        { normalize_number Complex(0, val[1]) }
+            | '-' o_ureal 'i'        { normalize_number Complex(0, -val[1]) }
             | '+' 'i'                { Complex(0, 1) }
             | '-' 'i'                { Complex(0, -1) }
   o_real    : sign o_ureal           { val[0] == '-' ? -val[1] : val[1] }
   o_ureal   : o_uint
-            | o_uint '/' o_uint      { normalize Rational(val[0], val[2]) }
+            | o_uint '/' o_uint      { normalize_number Rational(val[0], val[2]) }
   o_uint    : o_chars                { val[0].to_i(8) }
   o_chars   : o_char
             | o_chars o_char         { val[0] << val[1] }
@@ -188,20 +188,20 @@ rule
             | exactness NUM_PREFIX_O { val[0] }
 
   decimal   : d_prefix d_complex
-              { val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) }
+              { val[0].nil? ? val[1] : (val[0] ? inexact_to_exact(val[1]) : exact_to_inexact(val[1])) }
   d_complex : d_real
-            | d_real '@' d_real      { normalize Complex.polar(val[0], val[2]) }
-            | d_real '+' d_ureal 'i' { normalize Complex(val[0], val[2]) }
-            | d_real '-' d_ureal 'i' { normalize Complex(val[0], -val[2]) }
+            | d_real '@' d_real      { normalize_number Complex.polar(val[0], val[2]) }
+            | d_real '+' d_ureal 'i' { normalize_number Complex(val[0], val[2]) }
+            | d_real '-' d_ureal 'i' { normalize_number Complex(val[0], -val[2]) }
             | d_real '+' 'i'         { Complex(val[0], 1) }
             | d_real '-' 'i'         { Complex(val[0], -1) }
-            | '+' d_ureal 'i'        { normalize Complex(0, val[1]) }
-            | '-' d_ureal 'i'        { normalize Complex(0, -val[1]) }
+            | '+' d_ureal 'i'        { normalize_number Complex(0, val[1]) }
+            | '-' d_ureal 'i'        { normalize_number Complex(0, -val[1]) }
             | '+' 'i'                { Complex(0, 1) }
             | '-' 'i'                { Complex(0, -1) }
   d_real    : sign d_ureal           { val[0] == '-' ? -val[1] : val[1] }
   d_ureal   : d_uint
-            | d_uint '/' d_uint      { normalize Rational(val[0], val[2]) }
+            | d_uint '/' d_uint      { normalize_number Rational(val[0], val[2]) }
             | d_decimal
   d_decimal : d_uint suffix          { val[0].to_f * (10 ** val[1]) }
             | '.' d_chars suffix     { "0.#{val[1]}".to_f * (10 ** val[2]) }
@@ -217,20 +217,20 @@ rule
             | exactness
 
   hexadecimal : h_prefix h_complex
-                { val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) }
+                { val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : exact_to_inexact(val[1])) }
   h_complex : h_real
-            | h_real '@' h_real      { normalize Complex.polar(val[0], val[2]) }
-            | h_real '+' h_ureal 'i' { normalize Complex(val[0], val[2]) }
-            | h_real '-' h_ureal 'i' { normalize Complex(val[0], -val[2]) }
+            | h_real '@' h_real      { normalize_number Complex.polar(val[0], val[2]) }
+            | h_real '+' h_ureal 'i' { normalize_number Complex(val[0], val[2]) }
+            | h_real '-' h_ureal 'i' { normalize_number Complex(val[0], -val[2]) }
             | h_real '+' 'i'         { Complex(val[0], 1) }
             | h_real '-' 'i'         { Complex(val[0], -1) }
-            | '+' h_ureal 'i'        { normalize Complex(0, val[1]) }
-            | '-' h_ureal 'i'        { normalize Complex(0, -val[1]) }
+            | '+' h_ureal 'i'        { normalize_number Complex(0, val[1]) }
+            | '-' h_ureal 'i'        { normalize_number Complex(0, -val[1]) }
             | '+' 'i'                { Complex(0, 1) }
             | '-' 'i'                { Complex(0, -1) }
   h_real    : sign h_ureal           { val[0] == '-' ? -val[1] : val[1] }
   h_ureal   : h_uint
-            | h_uint '/' h_uint      { normalize Rational(val[0], val[2]) }
+            | h_uint '/' h_uint      { normalize_number Rational(val[0], val[2]) }
   h_uint    : h_chars                { val[0].to_i(16) }
   h_chars   : h_char
             | h_chars h_char         { val[0] << val[1] }
@@ -250,10 +250,13 @@ end
 
 ---- header
 require 'rubic/lexer'
+require 'rubic/util'
 
 module Rubic
 
 ---- inner
+include Rubic::Util
+
 def parse(str)
   @lexer = Rubic::Lexer.new(str)
   do_parse
@@ -267,41 +270,6 @@ end
 
 def on_error(t, val, vstack)
   raise Rubic::ParseError, "parse error near #{token_to_str(t)}"
-end
-
-def to_exact(num)
-  case num
-  when Integer, Rational
-    num
-  when Float
-    num.to_r
-  when Complex
-    Complex(num.real.to_r, num.imag.to_r)
-  else
-    raise TypeError, "unexpected type of number: #{num.class}"
-  end
-end
-
-def to_inexact(num)
-  case num
-  when Integer, Rational, Float
-    num.to_f
-  when Complex
-    Complex(num.real.to_f, num.imag.to_f)
-  else
-    raise TypeError, "unexpected type of number: #{num.class}"
-  end
-end
-
-def normalize(num)
-  case num
-  when Complex
-    num.imag.zero? ? num.real : num
-  when Rational
-    num.denominator == 1 ? num.numerator : num
-  else
-    num
-  end
 end
 
 ---- footer

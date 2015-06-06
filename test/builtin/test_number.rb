@@ -110,14 +110,14 @@ class TestNumber < MiniTest::Test
 
   def test_exactness_predicates
     assert @rubic.evaluate('(exact? 1)')
-    assert @rubic.evaluate('(exact? 1.0)')
+    refute @rubic.evaluate('(exact? 1.0)')
     refute @rubic.evaluate('(exact? 0.1)')
     assert @rubic.evaluate('(exact? 1/2)')
     assert @rubic.evaluate('(exact? 3+4i)')
     refute @rubic.evaluate('(exact? 0.5+2i)')
 
     refute @rubic.evaluate('(inexact? 1)')
-    refute @rubic.evaluate('(inexact? 1.0)')
+    assert @rubic.evaluate('(inexact? 1.0)')
     assert @rubic.evaluate('(inexact? 0.1)')
     refute @rubic.evaluate('(inexact? 1/2)')
     refute @rubic.evaluate('(inexact? 3+4i)')
@@ -160,6 +160,40 @@ class TestNumber < MiniTest::Test
     refute @rubic.evaluate('(even? 3.0)')
     assert_raises Rubic::TypeError do
       @rubic.evaluate('(even? 1.5)')
+    end
+  end
+
+  def test_max_and_min_procedures
+    assert_equal 3, @rubic.evaluate('(max 1 2 3)')
+    assert_equal 1, @rubic.evaluate('(max 1)')
+    assert_same 3.0, @rubic.evaluate('(max 3 1.2 2.5)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(max 1 2 1+i)")
+    end
+
+    assert_equal 1, @rubic.evaluate('(min 1 2 3)')
+    assert_equal 1, @rubic.evaluate('(min 1)')
+    assert_same 1.0, @rubic.evaluate('(min 3.2 1 2.7)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(min 1+i 2 3)')
+    end
+  end
+
+  def test_exactness_converters
+    assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
+    assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')
+    assert_equal 0.5, @rubic.evaluate('(exact->inexact 1/2)')
+    assert_equal Complex(0.5, 1.0), @rubic.evaluate('(exact->inexact 1/2+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(exact->inexact 'abc)")
+    end
+
+    assert_same 1, @rubic.evaluate('(inexact->exact 1)')
+    assert_same 1, @rubic.evaluate('(inexact->exact 1.0)')
+    assert_equal 1/2r, @rubic.evaluate('(inexact->exact 0.5)')
+    assert_equal Complex(1/2r, 1), @rubic.evaluate('(inexact->exact 0.5+1.0i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(inexact->exact 'abc)")
     end
   end
 end

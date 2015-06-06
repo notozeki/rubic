@@ -7,12 +7,15 @@
 require 'racc/parser.rb'
 
 require 'rubic/lexer'
+require 'rubic/util'
 
 module Rubic
 
 class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 257)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 258)
+include Rubic::Util
+
 def parse(str)
   @lexer = Rubic::Lexer.new(str)
   do_parse
@@ -26,41 +29,6 @@ end
 
 def on_error(t, val, vstack)
   raise Rubic::ParseError, "parse error near #{token_to_str(t)}"
-end
-
-def to_exact(num)
-  case num
-  when Integer, Rational
-    num
-  when Float
-    num.to_r
-  when Complex
-    Complex(num.real.to_r, num.imag.to_r)
-  else
-    raise TypeError, "unexpected type of number: #{num.class}"
-  end
-end
-
-def to_inexact(num)
-  case num
-  when Integer, Rational, Float
-    num.to_f
-  when Complex
-    Complex(num.real.to_f, num.imag.to_f)
-  else
-    raise TypeError, "unexpected type of number: #{num.class}"
-  end
-end
-
-def normalize(num)
-  case num
-  when Complex
-    num.imag.zero? ? num.real : num
-  when Rational
-    num.denominator == 1 ? num.numerator : num
-  else
-    num
-  end
 end
 
 ...end parser.y/module_eval...
@@ -978,7 +946,7 @@ module_eval(<<'.,.,', 'parser.y', 143)
 
 module_eval(<<'.,.,', 'parser.y', 146)
   def _reduce_43(val, _values)
-     val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) 
+     val[0].nil? ? val[1] : (val[0] ? inexact_to_exact(val[1]) : exact_to_inexact(val[1])) 
   end
 .,.,
 
@@ -986,19 +954,19 @@ module_eval(<<'.,.,', 'parser.y', 146)
 
 module_eval(<<'.,.,', 'parser.y', 148)
   def _reduce_45(val, _values)
-     normalize Complex.polar(val[0], val[2]) 
+     normalize_number Complex.polar(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 149)
   def _reduce_46(val, _values)
-     normalize Complex(val[0], val[2]) 
+     normalize_number Complex(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 150)
   def _reduce_47(val, _values)
-     normalize Complex(val[0], -val[2]) 
+     normalize_number Complex(val[0], -val[2]) 
   end
 .,.,
 
@@ -1016,13 +984,13 @@ module_eval(<<'.,.,', 'parser.y', 152)
 
 module_eval(<<'.,.,', 'parser.y', 153)
   def _reduce_50(val, _values)
-     normalize Complex(0, val[1]) 
+     normalize_number Complex(0, val[1]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 154)
   def _reduce_51(val, _values)
-     normalize Complex(0, -val[1]) 
+     normalize_number Complex(0, -val[1]) 
   end
 .,.,
 
@@ -1048,7 +1016,7 @@ module_eval(<<'.,.,', 'parser.y', 157)
 
 module_eval(<<'.,.,', 'parser.y', 159)
   def _reduce_56(val, _values)
-     normalize Rational(val[0], val[2]) 
+     normalize_number Rational(val[0], val[2]) 
   end
 .,.,
 
@@ -1084,7 +1052,7 @@ module_eval(<<'.,.,', 'parser.y', 165)
 
 module_eval(<<'.,.,', 'parser.y', 168)
   def _reduce_64(val, _values)
-     val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) 
+     val[0].nil? ? val[1] : (val[0] ? inexact_to_exact(val[1]) : exact_to_inexact(val[1])) 
   end
 .,.,
 
@@ -1092,19 +1060,19 @@ module_eval(<<'.,.,', 'parser.y', 168)
 
 module_eval(<<'.,.,', 'parser.y', 170)
   def _reduce_66(val, _values)
-     normalize Complex.polar(val[0], val[2]) 
+     normalize_number Complex.polar(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 171)
   def _reduce_67(val, _values)
-     normalize Complex(val[0], val[2]) 
+     normalize_number Complex(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 172)
   def _reduce_68(val, _values)
-     normalize Complex(val[0], -val[2]) 
+     normalize_number Complex(val[0], -val[2]) 
   end
 .,.,
 
@@ -1122,13 +1090,13 @@ module_eval(<<'.,.,', 'parser.y', 174)
 
 module_eval(<<'.,.,', 'parser.y', 175)
   def _reduce_71(val, _values)
-     normalize Complex(0, val[1]) 
+     normalize_number Complex(0, val[1]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 176)
   def _reduce_72(val, _values)
-     normalize Complex(0, -val[1]) 
+     normalize_number Complex(0, -val[1]) 
   end
 .,.,
 
@@ -1154,7 +1122,7 @@ module_eval(<<'.,.,', 'parser.y', 179)
 
 module_eval(<<'.,.,', 'parser.y', 181)
   def _reduce_77(val, _values)
-     normalize Rational(val[0], val[2]) 
+     normalize_number Rational(val[0], val[2]) 
   end
 .,.,
 
@@ -1202,7 +1170,7 @@ module_eval(<<'.,.,', 'parser.y', 187)
 
 module_eval(<<'.,.,', 'parser.y', 190)
   def _reduce_91(val, _values)
-     val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) 
+     val[0].nil? ? val[1] : (val[0] ? inexact_to_exact(val[1]) : exact_to_inexact(val[1])) 
   end
 .,.,
 
@@ -1210,19 +1178,19 @@ module_eval(<<'.,.,', 'parser.y', 190)
 
 module_eval(<<'.,.,', 'parser.y', 192)
   def _reduce_93(val, _values)
-     normalize Complex.polar(val[0], val[2]) 
+     normalize_number Complex.polar(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 193)
   def _reduce_94(val, _values)
-     normalize Complex(val[0], val[2]) 
+     normalize_number Complex(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 194)
   def _reduce_95(val, _values)
-     normalize Complex(val[0], -val[2]) 
+     normalize_number Complex(val[0], -val[2]) 
   end
 .,.,
 
@@ -1240,13 +1208,13 @@ module_eval(<<'.,.,', 'parser.y', 196)
 
 module_eval(<<'.,.,', 'parser.y', 197)
   def _reduce_98(val, _values)
-     normalize Complex(0, val[1]) 
+     normalize_number Complex(0, val[1]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 198)
   def _reduce_99(val, _values)
-     normalize Complex(0, -val[1]) 
+     normalize_number Complex(0, -val[1]) 
   end
 .,.,
 
@@ -1272,7 +1240,7 @@ module_eval(<<'.,.,', 'parser.y', 201)
 
 module_eval(<<'.,.,', 'parser.y', 203)
   def _reduce_104(val, _values)
-     normalize Rational(val[0], val[2]) 
+     normalize_number Rational(val[0], val[2]) 
   end
 .,.,
 
@@ -1352,7 +1320,7 @@ module_eval(<<'.,.,', 'parser.y', 215)
 
 module_eval(<<'.,.,', 'parser.y', 219)
   def _reduce_126(val, _values)
-     val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : to_inexact(val[1])) 
+     val[0].nil? ? val[1] : (val[0] ? to_exact(val[1]) : exact_to_inexact(val[1])) 
   end
 .,.,
 
@@ -1360,19 +1328,19 @@ module_eval(<<'.,.,', 'parser.y', 219)
 
 module_eval(<<'.,.,', 'parser.y', 221)
   def _reduce_128(val, _values)
-     normalize Complex.polar(val[0], val[2]) 
+     normalize_number Complex.polar(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 222)
   def _reduce_129(val, _values)
-     normalize Complex(val[0], val[2]) 
+     normalize_number Complex(val[0], val[2]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 223)
   def _reduce_130(val, _values)
-     normalize Complex(val[0], -val[2]) 
+     normalize_number Complex(val[0], -val[2]) 
   end
 .,.,
 
@@ -1390,13 +1358,13 @@ module_eval(<<'.,.,', 'parser.y', 225)
 
 module_eval(<<'.,.,', 'parser.y', 226)
   def _reduce_133(val, _values)
-     normalize Complex(0, val[1]) 
+     normalize_number Complex(0, val[1]) 
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 227)
   def _reduce_134(val, _values)
-     normalize Complex(0, -val[1]) 
+     normalize_number Complex(0, -val[1]) 
   end
 .,.,
 
@@ -1422,7 +1390,7 @@ module_eval(<<'.,.,', 'parser.y', 230)
 
 module_eval(<<'.,.,', 'parser.y', 232)
   def _reduce_139(val, _values)
-     normalize Rational(val[0], val[2]) 
+     normalize_number Rational(val[0], val[2]) 
   end
 .,.,
 

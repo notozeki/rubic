@@ -1,6 +1,10 @@
+require 'rubic/util'
+
 module Rubic
   module Builtin
     class Number
+      include Rubic::Util
+
       def +(*args)
         transitive_operation('+', 0, args) {|a, b| a + b }
       end
@@ -111,15 +115,15 @@ module Rubic
       end
 
       def exact?(suspect)
-        case
-        when integer?(suspect)
-          true
-        when rational?(suspect)
-          true
-        when real?(suspect)
-          false
-        when complex?(suspect)
+        case suspect
+        when Complex
           exact?(suspect.real) && exact?(suspect.imag)
+        when Float
+          false
+        when Rational
+          true
+        when Integer
+          true
         else
           false
         end
@@ -162,6 +166,36 @@ module Rubic
           raise Rubic::TypeError, "`#{suspect}' is not an integer"
         end
         suspect.to_i.even?
+      end
+
+      def max(a, *args)
+        args.unshift(a)
+        exact = args.all? do |e|
+          raise Rubic::TypeError, "`#{e}' is not a real number" unless real?(e)
+          exact?(e)
+        end
+        exact ? args.max : __send__(:'exact->inexact', args.max)
+      end
+
+      def min(a, *args)
+        args.unshift(a)
+        exact = args.all? do |e|
+          raise Rubic::TypeError, "`#{e}' is not a real number" unless real?(e)
+          exact?(e)
+        end
+        exact ? args.min : __send__(:'exact->inexact', args.min)
+      end
+
+      define_method 'inexact->exact' do |num|
+        raise Rubic::TypeError, "`#{num}' is not a number" unless number?(num)
+        return num if exact?(num)
+        inexact_to_exact(num)
+      end
+
+      define_method 'exact->inexact' do |num|
+        raise Rubic::TypeError, "`#{num}' is not a number" unless number?(num)
+        return num unless exact?(num)
+        exact_to_inexact(num)
       end
 
       private
