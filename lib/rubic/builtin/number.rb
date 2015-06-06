@@ -174,7 +174,7 @@ module Rubic
           raise Rubic::TypeError, "`#{e}' is not a real number" unless real?(e)
           exact?(e)
         end
-        exact ? args.max : __send__(:'exact->inexact', args.max)
+        exact ? args.max : exact_to_inexact(args.max)
       end
 
       def min(a, *args)
@@ -183,7 +183,7 @@ module Rubic
           raise Rubic::TypeError, "`#{e}' is not a real number" unless real?(e)
           exact?(e)
         end
-        exact ? args.min : __send__(:'exact->inexact', args.min)
+        exact ? args.min : exact_to_inexact(args.min)
       end
 
       define_method 'inexact->exact' do |num|
