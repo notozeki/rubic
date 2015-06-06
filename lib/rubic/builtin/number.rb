@@ -186,6 +186,11 @@ module Rubic
         exact ? args.min : exact_to_inexact(args.min)
       end
 
+      def abs(num)
+        raise Rubic::TypeError, "`#{num}' is not a number" unless number?(num)
+        num.abs
+      end
+
       define_method 'inexact->exact' do |num|
         raise Rubic::TypeError, "`#{num}' is not a number" unless number?(num)
         return num if exact?(num)
