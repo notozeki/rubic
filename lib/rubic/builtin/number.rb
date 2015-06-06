@@ -129,6 +129,41 @@ module Rubic
         number?(suspect) && !exact?(suspect)
       end
 
+      def zero?(suspect)
+        unless number?(suspect)
+          raise Rubic::TypeError, "`#{suspect}' is not a number"
+        end
+        suspect.zero?
+      end
+
+      def positive?(suspect)
+        unless real?(suspect)
+          raise Rubic::TypeError, "`#{suspect}' is not a real number"
+        end
+        suspect > 0.0
+      end
+
+      def negative?(suspect)
+        unless real?(suspect)
+          raise Rubic::TypeError, "`#{suspect}' is not a real number"
+        end
+        suspect < 0.0
+      end
+
+      def odd?(suspect)
+        unless integer?(suspect)
+          raise Rubic::TypeError, "`#{suspect}' is not an integer"
+        end
+        suspect.to_i.odd?
+      end
+
+      def even?(suspect)
+        unless integer?(suspect)
+          raise Rubic::TypeError, "`#{suspect}' is not an integer"
+        end
+        suspect.to_i.even?
+      end
+
       private
 
       def transitive_operation(opname, initial=nil, args)

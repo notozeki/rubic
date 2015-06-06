@@ -126,4 +126,40 @@ class TestNumber < MiniTest::Test
     refute @rubic.evaluate("(exact? 'abc)")
     refute @rubic.evaluate("(inexact? 'abc)")
   end
+
+  def test_numerical_predicates
+    assert @rubic.evaluate('(zero? 0)')
+    assert @rubic.evaluate('(zero? 0.0)')
+    refute @rubic.evaluate('(zero? 1.0)')
+    refute @rubic.evaluate('(zero? 1+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(zero? 'abc)")
+    end
+
+    assert @rubic.evaluate('(positive? 1.0)')
+    refute @rubic.evaluate('(positive? -1.0)')
+    refute @rubic.evaluate('(positive? 0.0)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(positive? 1+i)')
+    end
+
+    assert @rubic.evaluate('(negative? -1.0)')
+    refute @rubic.evaluate('(negative? 1.0)')
+    refute @rubic.evaluate('(negative? 0.0)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(negative? 1+i)')
+    end
+
+    assert @rubic.evaluate('(odd? 3.0)')
+    refute @rubic.evaluate('(odd? 2.0)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(odd? 1.5)')
+    end
+
+    assert @rubic.evaluate('(even? 2.0)')
+    refute @rubic.evaluate('(even? 3.0)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(even? 1.5)')
+    end
+  end
 end
