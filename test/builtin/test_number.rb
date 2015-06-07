@@ -218,6 +218,26 @@ class TestNumber < MiniTest::Test
     end
   end
 
+  def test_gcd_and_lcm
+    assert_equal 4, @rubic.evaluate('(gcd 32 -36)')
+    assert_equal 7, @rubic.evaluate('(gcd 14 56 49)')
+    assert_equal 3, @rubic.evaluate('(gcd 3)')
+    assert_equal 0, @rubic.evaluate('(gcd)')
+    assert_same 4.0, @rubic.evaluate('(gcd 32.0 36)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(gcd 20 2.5)')
+    end
+
+    assert_equal 288, @rubic.evaluate('(lcm 32 -36)')
+    assert_equal 392, @rubic.evaluate('(lcm 14 56 49)')
+    assert_equal 3, @rubic.evaluate('(lcm 3)')
+    assert_equal 1, @rubic.evaluate('(lcm)')
+    assert_same 288.0, @rubic.evaluate('(lcm 32.0 36)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(lcm 20 2.5)')
+    end
+  end
+
   def test_exactness_converters
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')

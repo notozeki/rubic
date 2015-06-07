@@ -199,6 +199,26 @@ module Rubic
         exact?(a) && exact?(b) ? ret : exact_to_inexact(ret)
       end
 
+      def gcd(*args)
+        exact = true
+        ret = args.reduce(0) do |res, num|
+          ensure_integer num
+          exact &&= exact?(num)
+          res.gcd(num.to_i)
+        end
+        exact ? ret : exact_to_inexact(ret)
+      end
+
+      def lcm(*args)
+        exact = true
+        ret = args.reduce(1) do |res, num|
+          ensure_integer num
+          exact &&= exact?(num)
+          res.lcm(num.to_i)
+        end
+        exact ? ret : exact_to_inexact(ret)
+      end
+
       define_method 'inexact->exact' do |num|
         ensure_number num
         return num if exact?(num)
