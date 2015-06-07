@@ -14,7 +14,7 @@ class TestNumber < MiniTest::Test
     assert_equal -10, @rubic.evaluate('(- 10)')
     assert_equal 1, @rubic.evaluate('(*)')
     assert_equal 10, @rubic.evaluate('(* 10)')
-    assert_equal 0, @rubic.evaluate('(/ 2)')
+    assert_equal 1/2r, @rubic.evaluate('(/ 2)')
   end
 
   def test_invalid_arithmetic_operations
@@ -235,6 +235,22 @@ class TestNumber < MiniTest::Test
     assert_same 288.0, @rubic.evaluate('(lcm 32.0 36)')
     assert_raises Rubic::TypeError do
       @rubic.evaluate('(lcm 20 2.5)')
+    end
+  end
+
+  def test_fractional_procedures
+    assert_equal 3, @rubic.evaluate('(numerator (/ 6 4))')
+    assert_equal -1, @rubic.evaluate('(numerator -1/3)')
+    assert_same 3.0, @rubic.evaluate('(numerator (exact->inexact (/ 6 4)))')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(numerator 0+i)')
+    end
+
+    assert_equal 2, @rubic.evaluate('(denominator (/ 6 4))')
+    assert_equal 3, @rubic.evaluate('(denominator -1/3)')
+    assert_same 2.0, @rubic.evaluate('(denominator (exact->inexact (/ 6 4)))')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(denominator 0+i)')
     end
   end
 

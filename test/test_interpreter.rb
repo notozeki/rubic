@@ -7,14 +7,15 @@ class TestInterpreter < Minitest::Test
   end
 
   def test_evaluate_expressions
-    assert_equal 486,  @rubic.evaluate('486')
-    assert_equal 486,  @rubic.evaluate('(+ 137 349)')
-    assert_equal 666,  @rubic.evaluate('(- 1000 334)')
-    assert_equal 495,  @rubic.evaluate('(* 5 99)')
-    assert_equal 2,    @rubic.evaluate('(/ 10 5)')
-    assert_equal 12.7, @rubic.evaluate('(+ 2.7 10)')
-    assert_equal 75,   @rubic.evaluate('(+ 21 35 12 7)')
-    assert_equal 1200, @rubic.evaluate('(* 25 4 12)')
+    assert_equal 486,   @rubic.evaluate('486')
+    assert_equal 486,   @rubic.evaluate('(+ 137 349)')
+    assert_equal 666,   @rubic.evaluate('(- 1000 334)')
+    assert_equal 495,   @rubic.evaluate('(* 5 99)')
+    assert_equal 2,     @rubic.evaluate('(/ 10 5)')
+    assert_equal 12.7,  @rubic.evaluate('(+ 2.7 10)')
+    assert_equal 75,    @rubic.evaluate('(+ 21 35 12 7)')
+    assert_equal 1200,  @rubic.evaluate('(* 25 4 12)')
+    assert_equal 3/20r, @rubic.evaluate('(/ 3 4 5)')
   end
 
   def test_evaluate_nested_expressions

@@ -29,9 +29,9 @@ module Rubic
         when 0
           raise Rubic::ArgumentError, "wrong number of arguments (0 for 1+)"
         when 1
-          1 / args.first
+          1.quo(args.first)
         else
-          transitive_operation('/', args) {|a, b| a / b }
+          transitive_operation('/', args) {|a, b| a.quo(b) }
         end
       end
 
@@ -217,6 +217,18 @@ module Rubic
           res.lcm(num.to_i)
         end
         exact ? ret : exact_to_inexact(ret)
+      end
+
+      def numerator(num)
+        ensure_real num
+        ret = num.to_r.numerator
+        exact?(num) ? ret : exact_to_inexact(ret)
+      end
+
+      def denominator(num)
+        ensure_real num
+        ret = num.to_r.denominator
+        exact?(num) ? ret : exact_to_inexact(ret)
       end
 
       define_method 'inexact->exact' do |num|
