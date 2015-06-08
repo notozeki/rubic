@@ -251,6 +251,11 @@ module Rubic
         num.round
       end
 
+      def rationalize(num, eps)
+        ensure_real num
+        normalize_number num.rationalize(eps)
+      end
+
       define_method 'inexact->exact' do |num|
         ensure_number num
         return num if exact?(num)

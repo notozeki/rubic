@@ -288,6 +288,15 @@ class TestNumber < MiniTest::Test
     end
   end
 
+  def test_rationalize
+    assert_equal 1/3r, @rubic.evaluate('(rationalize (inexact->exact .3) 1/10)')
+    assert_equal @rubic.evaluate('#i1/3'), @rubic.evaluate('(rationalize .3 1/10)')
+    assert_same 7, @rubic.evaluate('(rationalize 7 1/10)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(rationalize 0+i 1/10)')
+    end
+  end
+
   def test_exactness_converters
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')
