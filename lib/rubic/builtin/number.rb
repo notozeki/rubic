@@ -231,6 +231,26 @@ module Rubic
         exact?(num) ? ret : exact_to_inexact(ret)
       end
 
+      def floor(num)
+        ensure_real num
+        num.floor
+      end
+
+      def ceiling(num)
+        ensure_real num
+        num.ceil
+      end
+
+      def truncate(num)
+        ensure_real num
+        num.truncate
+      end
+
+      def round(num)
+        ensure_real num
+        num.round
+      end
+
       define_method 'inexact->exact' do |num|
         ensure_number num
         return num if exact?(num)

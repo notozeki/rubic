@@ -254,6 +254,40 @@ class TestNumber < MiniTest::Test
     end
   end
 
+  def test_rounding_procedures
+    assert_equal 3.0, @rubic.evaluate('(floor 3.5)')
+    assert_equal -5.0, @rubic.evaluate('(floor -4.3)')
+    assert_same 3, @rubic.evaluate('(floor 7/2)')
+    assert_same 7, @rubic.evaluate('(floor 7)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(floor 0+i)')
+    end
+
+    assert_equal 4.0, @rubic.evaluate('(ceiling 3.5)')
+    assert_equal -4.0, @rubic.evaluate('(ceiling -4.3)')
+    assert_same 4, @rubic.evaluate('(ceiling 7/2)')
+    assert_same 7, @rubic.evaluate('(ceiling 7)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(ceiling 0+i)')
+    end
+
+    assert_equal 3.0, @rubic.evaluate('(truncate 3.5)')
+    assert_equal -4.0, @rubic.evaluate('(truncate -4.3)')
+    assert_same 3, @rubic.evaluate('(truncate 7/2)')
+    assert_same 7, @rubic.evaluate('(truncate 7)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(truncate 0+i)')
+    end
+
+    assert_equal 4.0, @rubic.evaluate('(round 3.5)')
+    assert_equal -4.0, @rubic.evaluate('(round -4.3)')
+    assert_same 4, @rubic.evaluate('(round 7/2)')
+    assert_same 7, @rubic.evaluate('(round 7)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(round 0+i)')
+    end
+  end
+
   def test_exactness_converters
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')
