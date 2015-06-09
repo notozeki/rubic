@@ -305,6 +305,16 @@ module Rubic
         end
       end
 
+      def sqrt(num)
+        ensure_number num
+        CMath.sqrt(num)
+      end
+
+      def expt(x, y)
+        ensure_number x, y
+        x ** y
+      end
+
       define_method 'inexact->exact' do |num|
         ensure_number num
         return num if exact?(num)

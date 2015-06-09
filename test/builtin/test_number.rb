@@ -351,6 +351,22 @@ class TestNumber < MiniTest::Test
     end
   end
 
+  def test_sqrt_and_expt
+    assert_in_delta 1.7320508075688772, @rubic.evaluate('(sqrt 3)')
+    assert_in_delta Complex(0.0, 5.744562646538029), @rubic.evaluate('(sqrt -33)')
+    assert_in_delta Complex(0.7071067811865476, 0.7071067811865475), @rubic.evaluate('(sqrt 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(sqrt 'abc)")
+    end
+
+    assert_equal 1024, @rubic.evaluate('(expt 2 10)')
+    assert_in_delta -2, @rubic.evaluate('(expt 0+1.4142135623730951i 2)')
+    assert_in_delta Complex(0.2739572538301211, 0.5837007587586147), @rubic.evaluate('(expt 1+i 1+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(expt 2 'abc)")
+    end
+  end
+
   def test_exactness_converters
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')
