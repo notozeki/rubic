@@ -367,6 +367,41 @@ class TestNumber < MiniTest::Test
     end
   end
 
+  def test_complex_number_procedures
+    assert_equal Complex(1, 2), @rubic.evaluate('(make-rectangular 1 2)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(make-rectangular 1 2+i)')
+    end
+
+    assert_in_delta Complex(-0.4161468365471424, 0.9092974268256817), @rubic.evaluate('(make-polar 1 2)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate('(make-polar 1+i 2)')
+    end
+
+    assert_equal 7, @rubic.evaluate('(real-part 7+5i)')
+    assert_equal 3, @rubic.evaluate('(real-part 3)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(real-part 'abc)")
+    end
+
+    assert_equal 5, @rubic.evaluate('(imag-part 7+5i)')
+    assert_equal 0, @rubic.evaluate('(imag-part 3)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(imag-part 'abc)")
+    end
+
+    assert_in_delta 1.4142135623730951, @rubic.evaluate('(magnitude 1+i)')
+    assert_equal @rubic.evaluate('(abs 5/7)'), @rubic.evaluate('(magnitude 5/7)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(magnitude 'abc)")
+    end
+
+    assert_in_delta 0.7853981633974483, @rubic.evaluate('(angle 1+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(angle 'abc)")
+    end
+  end
+
   def test_exactness_converters
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')

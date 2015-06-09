@@ -315,6 +315,36 @@ module Rubic
         x ** y
       end
 
+      define_method 'make-rectangular' do |x, y|
+        ensure_real x, y
+        normalize_number Complex(x, y)
+      end
+
+      define_method 'make-polar' do |x, y|
+        ensure_real x, y
+        normalize_number Complex.polar(x, y)
+      end
+
+      define_method 'real-part' do |num|
+        ensure_number num
+        num.real
+      end
+
+      define_method 'imag-part' do |num|
+        ensure_number num
+        num.imag
+      end
+
+      def magnitude(num)
+        ensure_number num
+        num.magnitude
+      end
+
+      def angle(num)
+        ensure_number num
+        num.angle
+      end
+
       define_method 'inexact->exact' do |num|
         ensure_number num
         return num if exact?(num)
