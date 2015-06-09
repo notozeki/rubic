@@ -297,6 +297,60 @@ class TestNumber < MiniTest::Test
     end
   end
 
+  def test_transcendental_function_procedures
+    assert_in_delta 2.718281828459045, @rubic.evaluate('(exp 1)')
+    assert_in_delta Complex(0.5403023058681398, 0.8414709848078965), @rubic.evaluate('(exp 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(exp 'abc)")
+    end
+
+    assert_in_delta 0.0, @rubic.evaluate('(log 1)')
+    assert_in_delta Complex(0.0, 1.5707963267948966), @rubic.evaluate('(log 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(log 'abc)")
+    end
+
+    assert_in_delta 0.8414709848078965, @rubic.evaluate('(sin 1)')
+    assert_in_delta Complex(0.0, 1.1752011936438014), @rubic.evaluate('(sin 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(sin 'abc)")
+    end
+
+    assert_in_delta 0.5403023058681398, @rubic.evaluate('(cos 1)')
+    assert_in_delta 1.5430806348152437, @rubic.evaluate('(cos 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(cos 'abc)")
+    end
+
+    assert_in_delta 1.557407724654902, @rubic.evaluate('(tan 1)')
+    assert_in_delta Complex(0.0, 0.7615941559557649), @rubic.evaluate('(tan 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(tan 'abc)")
+    end
+
+    assert_in_delta 1.5707963267948966, @rubic.evaluate('(asin 1)')
+    assert_in_delta Complex(0.0, 0.8813735870195428), @rubic.evaluate('(asin 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(asin 'abc)")
+    end
+
+    assert_in_delta 0.0, @rubic.evaluate('(acos 1)')
+    assert_in_delta Complex(1.5707963267948966, -0.8813735870195428), @rubic.evaluate('(acos 0+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(acos 'abc)")
+    end
+
+    assert_in_delta 0.7853981633974483, @rubic.evaluate('(atan 1)')
+    assert_in_delta 0.4636476090008061, @rubic.evaluate('(atan 1 2)')
+    assert_in_delta Complex(1.0172219678978514, 0.4023594781085251), @rubic.evaluate('(atan 1+i)')
+    assert_raises Rubic::TypeError do
+      @rubic.evaluate("(atan 'abc)")
+    end
+    assert_raises Rubic::ArgumentError do
+      @rubic.evaluate("(atan 1 2 3)")
+    end
+  end
+
   def test_exactness_converters
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1)')
     assert_same 1.0, @rubic.evaluate('(exact->inexact 1.0)')

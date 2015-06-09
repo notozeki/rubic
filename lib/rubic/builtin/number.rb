@@ -1,3 +1,4 @@
+require 'cmath'
 require 'rubic/util'
 
 module Rubic
@@ -254,6 +255,54 @@ module Rubic
       def rationalize(num, eps)
         ensure_real num
         normalize_number num.rationalize(eps)
+      end
+
+      def exp(num)
+        ensure_number num
+        CMath.exp(num)
+      end
+
+      def log(num)
+        ensure_number num
+        CMath.log(num)
+      end
+
+      def sin(num)
+        ensure_number num
+        CMath.sin(num)
+      end
+
+      def cos(num)
+        ensure_number num
+        CMath.cos(num)
+      end
+
+      def tan(num)
+        ensure_number num
+        CMath.tan(num)
+      end
+
+      def asin(num)
+        ensure_number num
+        CMath.asin(num)
+      end
+
+      def acos(num)
+        ensure_number num
+        CMath.acos(num)
+      end
+
+      def atan(*args)
+        case args.size
+        when 1
+          ensure_number args[0]
+          CMath.atan(args[0])
+        when 2
+          ensure_number args[0], args[1]
+          Complex(args[1], args[0]).angle
+        else
+          raise Rubic::ArgumentError, "wrong number of arguments (#{args.size} for 1..2)"
+        end
       end
 
       define_method 'inexact->exact' do |num|
